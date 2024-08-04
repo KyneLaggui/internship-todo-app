@@ -13,7 +13,13 @@ const todosSlice = createSlice({
   initialState,
   reducers: {
     addTodo: (state, action) => {
-      const newTodo = { id: Date.now(), task: action.payload, completed: false };
+      const newTodo = {
+        id: Date.now(),
+        task: action.payload,
+        completed: false,
+        createdAt: new Date().toLocaleString(),
+        modifiedAt: null,
+      };
       state.push(newTodo);
       localStorage.setItem('todos', JSON.stringify(state)); 
     },
@@ -22,6 +28,7 @@ const todosSlice = createSlice({
       const todo = state.find(todo => todo.id === id);
       if (todo) {
         todo.task = task;
+        todo.modifiedAt = new Date().toLocaleString();
         localStorage.setItem('todos', JSON.stringify(state));
       }
     },
@@ -37,9 +44,12 @@ const todosSlice = createSlice({
         localStorage.setItem('todos', JSON.stringify(state)); 
       }
     },
+    loadTodos: (state, action) => {
+      return action.payload; 
+    },
   },
 });
 
-export const { addTodo, editTodo, removeTodo, toggleComplete } = todosSlice.actions;
+export const { addTodo, editTodo, removeTodo, toggleComplete, loadTodos } = todosSlice.actions;
 
 export default todosSlice.reducer;

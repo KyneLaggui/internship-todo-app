@@ -1,27 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addTodo, editTodo, removeTodo, toggleComplete } from '../redux/todosSlice';
+import { addTodo, editTodo, removeTodo, toggleComplete, loadTodos } from '../redux/todosSlice';
+import { Button, Form, ListGroup, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
+import { BsThreeDotsVertical } from "react-icons/bs";
 
-
-const Home = () => {
-  const todos = useSelector(state => state.todos);
+function TodoList() {
+  const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   const [newTask, setNewTask] = useState('');
   const [editTask, setEditTask] = useState('');
   const [editId, setEditId] = useState(null);
-  const [show, setShow] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+
+  useEffect(() => {
+    const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+    dispatch(loadTodos(storedTodos));
+  }, [dispatch]);
 
   const handleAddTodo = () => {
     if (newTask.trim()) {
       dispatch(addTodo(newTask));
       setNewTask('');
+      setShowAdd(false);
     }
   };
 
   const handleEditTodo = (id, task) => {
     setEditId(id);
     setEditTask(task);
-    setShow(true);
+    setShowEdit(true);
   };
 
   const handleSaveEdit = () => {
@@ -29,40 +37,33 @@ const Home = () => {
       dispatch(editTodo({ id: editId, task: editTask }));
       setEditId(null);
       setEditTask('');
-      setShow(false);
+      setShowEdit(false);
     }
+  };
+
+  const handleCloseAdd = () => setShowAdd(false);
+  const handleCloseEdit = () => setShowEdit(false);
+
+  const handleToggleComplete = (id) => {
+    dispatch(toggleComplete(id));
   };
 
   const handleRemoveTodo = (id) => {
     dispatch(removeTodo(id));
   };
-  
-  const handleToggleComplete = (id) => {
-    dispatch(toggleComplete(id));
-  };
-
-  const handleClose = () => setShow(false);
 
   return (
-   
-    <div className="container mt-5">
-      <div className="mb-3">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Enter new task"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-        />
-        <button className="btn btn-primary mt-2" onClick={handleAddTodo}>
-          Add Task
-        </button>
-      </div>
-      <ul className="list-group">
+    <div className="todo-container">
+      <h1 className='title'>Motion</h1>
+      <Button className="button-main" onClick={() => setShowAdd(true)}>
+        + New Task
+      </Button>
+
+      <ListGroup>
         {todos.map((todo) => (
-          <li
+          <ListGroup.Item
             key={todo.id}
-            className="list-group-item d-flex justify-content-between align-items-center"
+            className="main-container"
             style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
           >
             <div className="form-check">
@@ -73,60 +74,84 @@ const Home = () => {
                 onChange={() => handleToggleComplete(todo.id)}
               />
               <span className={todo.completed ? 'completed' : ''}>{todo.task}</span>
+              <div className="text-muted ml-2">
+                <small>
+                  {todo.modifiedAt 
+                    ? `Modified: ${todo.modifiedAt}` 
+                    : `Created: ${todo.createdAt}`}
+                </small>
+              </div>
             </div>
             <div>
-              <button
-                className="btn btn-warning btn-sm mr-2"
-                onClick={() => handleEditTodo(todo.id, todo.task)}
-                disabled={todo.completed} 
+              <DropdownButton
+                id="dropdown-basic-button"
+                title= {<BsThreeDotsVertical />}
+                variant="secondary"
+                size="sm"
+                className="mr-2"
+               
               >
-                Edit
-              </button>
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => handleRemoveTodo(todo.id)}
-                disabled={todo.completed} 
-              >
-                Remove
-              </button>
+                <Dropdown.Item onClick={() => handleEditTodo(todo.id, todo.task)} disabled={todo.completed}>
+                  Edit
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)} disabled={todo.completed}>
+                  Remove
+                </Dropdown.Item>
+              </DropdownButton>
             </div>
-          </li>
+          </ListGroup.Item>
         ))}
-      </ul>
+      </ListGroup>
 
-      {show && (
-        <div className="modal show" style={{ display: 'block' }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Task</h5>
-                <button type="button" className="close" onClick={handleClose}>
-                  <span>&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Edit task"
-                  value={editTask}
-                  onChange={(e) => setEditTask(e.target.value)}
-                />
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={handleClose}>
-                  Close
-                </button>
-                <button className="btn btn-primary" onClick={handleSaveEdit}>
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal show={showAdd} onHide={handleCloseAdd}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Task</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Control
+              type="text"
+              placeholder="Enter new task"
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseAdd}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleAddTodo}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showEdit} onHide={handleCloseEdit}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Task</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Control
+              type="text"
+              placeholder="Edit task"
+              value={editTask}
+              onChange={(e) => setEditTask(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseEdit}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleSaveEdit}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
 
-export default Home
+export default TodoList;
