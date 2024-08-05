@@ -34,9 +34,6 @@
 body {
   margin: 0;
   font-family: var(--ff-dm-sans);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .todo-container {
@@ -44,19 +41,34 @@ body {
   justify-content: flex-start;
   align-items: flex-start;
   flex-direction: column;
-  border: 1px solid red;
+  margin-inline: auto;
   gap: 2rem;
   min-height: 100vh;
-  padding: 2.5rem;
-  max-width: 700px;
+  height: 100%;
+  padding: 2rem; 
+  width: 100%;
+  max-width: 800px;
 }
 
 .title {
   font-size: 2.5rem;
-  border-bottom: 3px solid #ececec;
+  border-bottom: 2px solid #ececec;
   padding-bottom: 1.5rem;
   width: 100%;
   color: #141414;
+}
+
+.list-group {
+  width: 100%;
+}
+
+.main-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px;
+  border-left: 4px solid var(--purple-secondary);
+  padding: 1rem;
 }
 
 .btn-primary {
@@ -75,10 +87,6 @@ body {
   color:#454545;
 }
 
-
-
-
-
 .dropdown-toggle {
   background-color: none; 
 }
@@ -88,15 +96,6 @@ body {
 }
 
 
-.main-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin: 5px;
-  border-left: 4px solid var(--purple-secondary);
-  padding: 1rem;
-}
 
 @media (prefers-color-scheme: light) {
   :root {
