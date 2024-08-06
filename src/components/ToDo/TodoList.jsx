@@ -18,6 +18,9 @@ import EditTodoModal from './EditTodoModal';
 import SortDropdown from './SortDropdown';
 import noTasksImage from '../../assets/no-tasks.png'; 
 import "./TodoList.css"
+import { CiCalendar } from 'react-icons/ci';
+import { FaCheck, FaCircle, FaPlus, FaRegClock, FaTrash, FaUndo } from 'react-icons/fa';
+import { HiOutlineHashtag } from 'react-icons/hi';
 
 function TodoList({ filter, selectedTag }) {
   const todos = useSelector((state) => state.todos);
@@ -80,16 +83,19 @@ function TodoList({ filter, selectedTag }) {
 
   const handleCompleteAll = () => {
     dispatch(completeAllTodos());
+    toast.success("All tasks marked as done!");
   };
-
+  
   const handleUncompleteAll = () => {
     dispatch(uncompleteAllTodos());
+    toast.success("All tasks marked as undone!");
   };
-
+  
   const handleDeleteAll = () => {
     dispatch(deleteAllTodos());
     toast.success("All tasks deleted successfully!");
   };
+  
 
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
@@ -116,17 +122,17 @@ function TodoList({ filter, selectedTag }) {
       <ToastContainer />
 
       <div className="buttons-container">
-        <Button className="button-main" onClick={() => setShowAdd(true)}>
-          + New Task
+        <Button className="btn-list" onClick={() => setShowAdd(true)}>
+          <FaPlus style={{ marginRight: '8px' }} /> New Task
         </Button>
-        <Button variant="success" onClick={handleCompleteAll}>
-          Done All
+        <Button className="btn-list" onClick={handleCompleteAll}>
+          <FaCheck style={{ marginRight: '8px' }} /> Done All
         </Button>
-        <Button variant="warning" onClick={handleUncompleteAll}>
-          Undone All
+        <Button className="btn-list" onClick={handleUncompleteAll}>
+          <FaUndo style={{ marginRight: '8px' }} /> Undone All
         </Button>
-        <Button variant="danger" onClick={handleDeleteAll}>
-          Delete All
+        <Button className="btn-list" onClick={handleDeleteAll}>
+          <FaTrash style={{ marginRight: '8px' }} /> Delete All
         </Button>
       </div>
 
@@ -137,41 +143,66 @@ function TodoList({ filter, selectedTag }) {
       {filteredAndSortedTodos.length === 0 ? (
         <div className="no-tasks-container">
           <img src={noTasksImage} alt="No tasks" className="no-tasks-image" />
-          <p>No tasks available. Please add some tasks!</p>
+          <p>No tasks available!</p>
         </div>
       ) : (
         <ListGroup>
           {filteredAndSortedTodos.map((todo) => {
-            const isExpired = new Date(todo.endDate) < new Date(); // Check if the todo is expired
+            const isExpired = new Date(todo.endDate) < new Date(); 
 
             return (
               <ListGroup.Item
                 key={todo.id}
                 className="main-container"
-                style={{ textDecoration: todo.completed || isExpired ? 'line-through' : 'none' }} // Strike through if completed or expired
+                style={{ textDecoration: todo.completed || isExpired ? 'line-through' : 'none' }} 
               >
                 <div className="form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    checked={todo.completed}
-                    onChange={() => handleToggleComplete(todo.id)}
-                    disabled={isExpired} // Disable checkbox if expired
-                  />
-                  <span className={todo.completed ? 'completed' : ''}>{todo.task}</span>
-                  <div className="text-muted ml-2">
-                    <small>
-                      End: {todo.endDate ? format(new Date(todo.endDate), 'MM/dd/yyyy hh:mm a') : 'No end date'} <br />
-                      {calculateRemainingTime(todo.endDate)} <br />
-                      Tags: {todo.tags && todo.tags.length > 0 ? todo.tags.join(', ') : 'No tags'}
-                    </small>
+                  <div className='tasks-left'>
+                    <input
+                      type="checkbox"
+                      className="form-check-input checkbox-tasks"
+                      checked={todo.completed}
+                      onChange={() => handleToggleComplete(todo.id)}
+                      disabled={isExpired}
+                    />
+                    <div className='tasks-contents'>
+                      <span className={todo.completed ? 'completed' : ''}>
+                        <div className='tasks-important'>
+                          <h1 className="tasks-title">{todo.task}</h1>
+                          {todo.endDate && (  
+                            <div className='tasks-date'>
+                              <span className='tasks-icon'>
+                                <CiCalendar size={14} /> {format(new Date(todo.endDate), 'MM/dd/yyyy')}
+                              </span>
+                              <span className='tasks-icon'>
+                                <FaRegClock size={14} /> {format(new Date(todo.endDate), 'hh:mm a')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </span>
+                    </div>
                   </div>
-                  <Dropdown className="more-options">
-                    <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic">
-                      <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
-                    </DropdownButton>
-                  </Dropdown>
+                  
+                  <div className='tasks-right'>
+                    <div className="tasks-subcategories">  
+                      <div className='tasks-deadline'>
+                        <FaCircle size={8} />
+                        {calculateRemainingTime(todo.endDate)}
+                      </div>
+                      <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`}>
+                        <HiOutlineHashtag />
+                        {todo.tags && todo.tags.join(', ')}
+                      </div>
+                      
+                    </div>
+                    <Dropdown className="more-options">
+                      <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
+                        <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
+                      </DropdownButton>
+                    </Dropdown>
+                  </div>
                 </div>
               </ListGroup.Item>
             );

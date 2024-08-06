@@ -27,7 +27,7 @@ const SortDropdown = ({ setSortOption }) => {
       {sortOptions.map(option => (
         <Dropdown.Item
           key={option.value}
-          onClick={() => handleSelect(option.value)} // Handle item selection
+          onClick={() => handleSelect(option.value)} 
         >
           {option.label}
         </Dropdown.Item>
