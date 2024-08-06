@@ -4,7 +4,7 @@ import { FaBars } from 'react-icons/fa';
 import { BsFillHouseFill } from 'react-icons/bs';
 import "./Sidebar.css"
 
-const Sidebar = () => {
+const Sidebar = ({ setFilter }) => {
   const [open, setOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -43,9 +43,9 @@ const Sidebar = () => {
           Motion
         </h4>
         <Nav defaultActiveKey="/home" className="flex-column">
-          <Nav.Link href="/home" className="text-white">Home</Nav.Link>
-          <Nav.Link href="/about" className="text-white">About</Nav.Link>
-          <Nav.Link href="/contact" className="text-white">Contact</Nav.Link>
+          <Button onClick={() => setFilter('All')}>All</Button>
+          <Button onClick={() => setFilter('Done')}>Done</Button>
+          <Button onClick={() => setFilter('Pending')}>Tasks Pending</Button>
         </Nav>
       </div>
     </div>

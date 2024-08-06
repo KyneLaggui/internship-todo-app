@@ -16,7 +16,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 
-function TodoList() {
+function TodoList({ filter }) {
   const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   const [newTask, setNewTask] = useState('');
@@ -31,6 +31,18 @@ function TodoList() {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
     dispatch(loadTodos(storedTodos));
   }, [dispatch]);
+
+  const filteredTodos = () => {
+    switch (filter) {
+      case 'Done':
+        return todos.filter(todo => todo.completed);
+      case 'Pending':
+        return todos.filter(todo => !todo.completed);
+      case 'All':
+      default:
+        return todos;
+    }
+  };
 
   const handleAddTodo = () => {
     if (newTask.trim()) {
@@ -80,6 +92,7 @@ function TodoList() {
   const handleDeleteAll = () => {
     dispatch(deleteAllTodos());
   };
+  
 
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
@@ -117,7 +130,7 @@ function TodoList() {
       </div>
 
       <ListGroup>
-        {todos.map((todo) => (
+        {filteredTodos().map((todo) => (
           <ListGroup.Item
             key={todo.id}
             className="main-container"
