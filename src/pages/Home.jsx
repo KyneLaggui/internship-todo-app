@@ -16,7 +16,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 
-function TodoList({ filter, sortOption }) {
+function TodoList({ filter, sortOption, selectedTag }) {
   const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   const [newTask, setNewTask] = useState('');
@@ -26,46 +26,56 @@ function TodoList({ filter, sortOption }) {
   const [editId, setEditId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [editTags, setEditTags] = useState([]);
+  const [newTags, setNewTags] = useState([]);
+  
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
     dispatch(loadTodos(storedTodos));
   }, [dispatch]);
 
-  const filteredTodos = () => {
-    switch (filter) {
-      case 'Done':
-        return todos.filter(todo => todo.completed);
-      case 'Pending':
-        return todos.filter(todo => !todo.completed);
-      case 'All':
-      default:
-        return todos;
-    }
-  };
-
-  const sortedTodos = () => {
-    const todosCopy = [...todos]; // Create a shallow copy of the todos array
+  const getFilteredAndSortedTodos = () => {
+    const filteredTodos = todos.filter(todo => {
+      const matchesStatus = (() => {
+        switch (filter) {
+          case 'Done':
+            return todo.completed;
+          case 'Pending':
+            return !todo.completed;
+          case 'All':
+          default:
+            return true;
+        }
+      })();
+  
+      const matchesTag = selectedTag ? (todo.tags && todo.tags.includes(selectedTag)) : true;
+  
+      return matchesStatus && matchesTag;
+    });
+  
+    const todosCopy = [...filteredTodos];
   
     switch (sortOption) {
       case 'ascending':
-        return todosCopy.sort((a, b) => a.task.localeCompare(b.task)); 
+        return todosCopy.sort((a, b) => a.task.localeCompare(b.task));
       case 'descending':
         return todosCopy.sort((a, b) => b.task.localeCompare(a.task));
       case 'close':
-        return todosCopy.sort((a, b) => new Date(a.endDate) - new Date(b.endDate)).slice(0, 5); // Adjust as needed for "close"
+        return todosCopy.sort((a, b) => new Date(a.endDate) - new Date(b.endDate)).slice(0, 5);
       case 'far':
-        return todosCopy.sort((a, b) => new Date(b.endDate) - new Date(a.endDate)).slice(0, 5); // Adjust as needed for "far"
+        return todosCopy.sort((a, b) => new Date(b.endDate) - new Date(a.endDate)).slice(0, 5);
       default:
-        return todosCopy; 
+        return todosCopy;
     }
   };
 
   const handleAddTodo = () => {
     if (newTask.trim()) {
-      dispatch(addTodo({ task: newTask, endDate: newEndDate.toISOString() }));
+      dispatch(addTodo({ task: newTask, endDate: newEndDate.toISOString(), tags: newTags }));
       setNewTask('');
       setNewEndDate(new Date());
+      setNewTags([]); // Reset tags
       setShowAdd(false);
     }
   };
@@ -79,13 +89,15 @@ function TodoList({ filter, sortOption }) {
 
   const handleSaveEdit = () => {
     if (editTask.trim()) {
-      dispatch(editTodo({ id: editId, task: editTask, endDate: editEndDate.toISOString() }));
+      dispatch(editTodo({ id: editId, task: editTask, endDate: editEndDate.toISOString(), tags: editTags }));
       setEditId(null);
       setEditTask('');
       setEditEndDate(new Date());
+      setEditTags([]); // Reset tags
       setShowEdit(false);
     }
   };
+
 
   const handleCloseAdd = () => setShowAdd(false);
   const handleCloseEdit = () => setShowEdit(false);
@@ -147,7 +159,7 @@ function TodoList({ filter, sortOption }) {
       </div>
 
       <ListGroup>
-        {sortedTodos().map((todo) => (
+        {getFilteredAndSortedTodos().map((todo) => (
           <ListGroup.Item
             key={todo.id}
             className="main-container"
@@ -160,6 +172,7 @@ function TodoList({ filter, sortOption }) {
                 checked={todo.completed}
                 onChange={() => handleToggleComplete(todo.id)}
               />
+              <h1>{todo.tags}</h1>
               <span className={todo.completed ? 'completed' : ''}>{todo.task}</span>
               <div className="text-muted ml-2">
                 <small>
@@ -171,6 +184,7 @@ function TodoList({ filter, sortOption }) {
                 </small>
               </div>
             </div>
+            
             <div>
               <DropdownButton
                 id="dropdown-basic-button"
@@ -205,6 +219,15 @@ function TodoList({ filter, sortOption }) {
             />
           </Form.Group>
           <Form.Group>
+              <Form.Label>Tags</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter tags (comma-separated)"
+                value={newTags.join(', ')}
+                onChange={(e) => setNewTags(e.target.value.split(',').map(tag => tag.trim()))}
+              />
+            </Form.Group>
+          <Form.Group>
             <DatePicker
               selected={newEndDate}
               onChange={(date) => setNewEndDate(date)}
@@ -238,6 +261,17 @@ function TodoList({ filter, sortOption }) {
               onChange={(e) => setEditTask(e.target.value)}
             />
           </Form.Group>
+
+          <Form.Group>
+              <Form.Label>Tags</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter tags (comma-separated)"
+                value={editTags.join(', ')}
+                onChange={(e) => setEditTags(e.target.value.split(',').map(tag => tag.trim()))}
+              />
+            </Form.Group>
+
           <Form.Group>
             <DatePicker
               selected={editEndDate}

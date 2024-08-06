@@ -6,11 +6,13 @@ import { useState } from 'react';
 function App() {
   const [filter, setFilter] = useState('All');
   const [sortOption, setSortOption] = useState('default');
+  const [selectedTag, setSelectedTag] = useState('');
 
   return (
     <>
-    <Sidebar setFilter={setFilter} setSortOption={setSortOption} /> 
-    <Home filter={filter} sortOption={sortOption} /> 
+    <Sidebar setFilter={setFilter} setSortOption={setSortOption} setSelectedTag={setSelectedTag} />
+    <Home filter={filter} sortOption={sortOption} selectedTag={selectedTag} /> 
+    
     </>
   )
 }

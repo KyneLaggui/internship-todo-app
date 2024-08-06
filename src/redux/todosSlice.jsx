@@ -1,11 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const loadTodosFromLocalStorage = () => {
-  const savedTodos = localStorage.getItem('todos');
-  return savedTodos ? JSON.parse(savedTodos) : [];
+  try {
+    const serializedState = localStorage.getItem('todos');
+    return serializedState ? JSON.parse(serializedState) : [];
+  } catch (e) {
+    return [];
+  }
 };
 
-const initialState = loadTodosFromLocalStorage();
+const initialState = loadTodosFromLocalStorage().map(todo => ({
+  ...todo,
+  tags: todo.tags || []
+})) || [];
 
 const todosSlice = createSlice({
   name: 'todos',
@@ -19,17 +26,19 @@ const todosSlice = createSlice({
         completed: false,
         createdAt: new Date().toLocaleString(),
         modifiedAt: null,
+        tags: action.payload.tags || [], // Include tags
       };
       state.push(newTodo);
       localStorage.setItem('todos', JSON.stringify(state));
     },
     editTodo: (state, action) => {
-      const { id, task, endDate } = action.payload;
+      const { id, task, endDate, tags } = action.payload;
       const todo = state.find(todo => todo.id === id);
       if (todo) {
         todo.task = task;
         todo.endDate = endDate;
         todo.modifiedAt = new Date().toLocaleString();
+        todo.tags = tags || []; // Update tags
         localStorage.setItem('todos', JSON.stringify(state));
       }
     },

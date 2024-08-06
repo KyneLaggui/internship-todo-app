@@ -3,9 +3,12 @@ import { Button, Nav, Dropdown, DropdownButton } from 'react-bootstrap';
 import { FaBars } from 'react-icons/fa';
 import { BsFillHouseFill } from 'react-icons/bs';
 import "./Sidebar.css"
+import { useSelector } from 'react-redux';
 
-const Sidebar = ({ setFilter, setSortOption }) => {
+const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
   const [open, setOpen] = useState(false);
+  const todos = useSelector((state) => state.todos) || [];
+  const tags = [...new Set(todos.flatMap(todo => todo.tags))];
 
   const toggleSidebar = () => {
     setOpen(!open);
@@ -54,6 +57,11 @@ const Sidebar = ({ setFilter, setSortOption }) => {
             <Dropdown.Item onClick={() => setSortOption('close')}>Deadline Close</Dropdown.Item>
             <Dropdown.Item onClick={() => setSortOption('far')}>Deadline Far</Dropdown.Item>
         </DropdownButton>
+          {tags.map(tag => (
+          <Button key={tag} onClick={() => setSelectedTag(tag)}>{tag}</Button>
+        ))}
+        
+        
       </div>
     </div>
   );
