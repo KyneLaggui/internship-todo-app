@@ -45,10 +45,10 @@ const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
           <BsFillHouseFill className="mr-2" />
           Motion
         </h4>
-        <Nav defaultActiveKey="/home" className="flex-column">
-          <Button onClick={() => setFilter('All')}>All</Button>
-          <Button onClick={() => setFilter('Done')}>Done</Button>
-          <Button onClick={() => setFilter('Pending')}>Tasks Pending</Button>
+        <Nav className="flex-column">
+          <Button onClick={() => { setFilter('All'); setSelectedTag(''); }}>All</Button>
+          <Button onClick={() => { setFilter('Done'); }}>Done</Button>
+          <Button onClick={() => { setFilter('Pending')}}>Tasks Pending</Button>
         </Nav>
 
         <DropdownButton title="Sort By" variant="secondary" className="mt-2">
@@ -58,7 +58,7 @@ const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
             <Dropdown.Item onClick={() => setSortOption('far')}>Deadline Far</Dropdown.Item>
         </DropdownButton>
           {tags.map(tag => (
-          <Button key={tag} onClick={() => setSelectedTag(tag)}>{tag}</Button>
+          <Button key={tag} onClick={() => { setFilter('All'); setSelectedTag(tag); }}>{tag}</Button>
         ))}
         
         

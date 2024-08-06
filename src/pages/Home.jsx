@@ -37,7 +37,11 @@ function TodoList({ filter, sortOption, selectedTag }) {
 
   const getFilteredAndSortedTodos = () => {
     const filteredTodos = todos.filter(todo => {
-      const matchesStatus = (() => {
+      // Check if the selected tag matches the todo's tags or if no tag is selected
+      const hasSelectedTag = selectedTag ? (todo.tags && todo.tags.includes(selectedTag)) : true;
+  
+      // Check if the todo matches the current filter (Done, Pending, or All)
+      const matchesFilter = (() => {
         switch (filter) {
           case 'Done':
             return todo.completed;
@@ -45,15 +49,14 @@ function TodoList({ filter, sortOption, selectedTag }) {
             return !todo.completed;
           case 'All':
           default:
-            return true;
+            return true; // Show all todos, regardless of status
         }
       })();
   
-      const matchesTag = selectedTag ? (todo.tags && todo.tags.includes(selectedTag)) : true;
-  
-      return matchesStatus && matchesTag;
+      // Return todos that match the current filter and the selected tag (if applicable)
+      return matchesFilter && hasSelectedTag;
     });
-  
+    
     const todosCopy = [...filteredTodos];
   
     switch (sortOption) {
