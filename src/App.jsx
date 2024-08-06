@@ -5,11 +5,12 @@ import { useState } from 'react';
 
 function App() {
   const [filter, setFilter] = useState('All');
+  const [sortOption, setSortOption] = useState('default');
 
   return (
     <>
-    <Sidebar setFilter={setFilter} />
-    <Home filter={filter}/>
+    <Sidebar setFilter={setFilter} setSortOption={setSortOption} /> 
+    <Home filter={filter} sortOption={sortOption} /> 
     </>
   )
 }

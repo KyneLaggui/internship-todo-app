@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Button, Nav } from 'react-bootstrap';
+import { Button, Nav, Dropdown, DropdownButton } from 'react-bootstrap';
 import { FaBars } from 'react-icons/fa';
 import { BsFillHouseFill } from 'react-icons/bs';
 import "./Sidebar.css"
 
-const Sidebar = ({ setFilter }) => {
+const Sidebar = ({ setFilter, setSortOption }) => {
   const [open, setOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -47,6 +47,13 @@ const Sidebar = ({ setFilter }) => {
           <Button onClick={() => setFilter('Done')}>Done</Button>
           <Button onClick={() => setFilter('Pending')}>Tasks Pending</Button>
         </Nav>
+
+        <DropdownButton title="Sort By" variant="secondary" className="mt-2">
+            <Dropdown.Item onClick={() => setSortOption('ascending')}>Deadline Ascending</Dropdown.Item>
+            <Dropdown.Item onClick={() => setSortOption('descending')}>Deadline Descending</Dropdown.Item>
+            <Dropdown.Item onClick={() => setSortOption('close')}>Deadline Close</Dropdown.Item>
+            <Dropdown.Item onClick={() => setSortOption('far')}>Deadline Far</Dropdown.Item>
+        </DropdownButton>
       </div>
     </div>
   );

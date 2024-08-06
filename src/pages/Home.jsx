@@ -16,7 +16,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 
-function TodoList({ filter }) {
+function TodoList({ filter, sortOption }) {
   const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   const [newTask, setNewTask] = useState('');
@@ -41,6 +41,23 @@ function TodoList({ filter }) {
       case 'All':
       default:
         return todos;
+    }
+  };
+
+  const sortedTodos = () => {
+    const todosCopy = [...todos]; // Create a shallow copy of the todos array
+  
+    switch (sortOption) {
+      case 'ascending':
+        return todosCopy.sort((a, b) => a.task.localeCompare(b.task)); 
+      case 'descending':
+        return todosCopy.sort((a, b) => b.task.localeCompare(a.task));
+      case 'close':
+        return todosCopy.sort((a, b) => new Date(a.endDate) - new Date(b.endDate)).slice(0, 5); // Adjust as needed for "close"
+      case 'far':
+        return todosCopy.sort((a, b) => new Date(b.endDate) - new Date(a.endDate)).slice(0, 5); // Adjust as needed for "far"
+      default:
+        return todosCopy; 
     }
   };
 
@@ -130,7 +147,7 @@ function TodoList({ filter }) {
       </div>
 
       <ListGroup>
-        {filteredTodos().map((todo) => (
+        {sortedTodos().map((todo) => (
           <ListGroup.Item
             key={todo.id}
             className="main-container"
