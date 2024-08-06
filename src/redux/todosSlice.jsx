@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Load initial state from local storage
 const loadTodosFromLocalStorage = () => {
   const savedTodos = localStorage.getItem('todos');
   return savedTodos ? JSON.parse(savedTodos) : [];
@@ -21,7 +20,7 @@ const todosSlice = createSlice({
         modifiedAt: null,
       };
       state.push(newTodo);
-      localStorage.setItem('todos', JSON.stringify(state)); 
+      localStorage.setItem('todos', JSON.stringify(state));
     },
     editTodo: (state, action) => {
       const { id, task } = action.payload;
@@ -41,15 +40,29 @@ const todosSlice = createSlice({
       const todo = state.find(todo => todo.id === action.payload);
       if (todo) {
         todo.completed = !todo.completed;
-        localStorage.setItem('todos', JSON.stringify(state)); 
+        localStorage.setItem('todos', JSON.stringify(state));
       }
     },
     loadTodos: (state, action) => {
-      return action.payload; 
+      return action.payload;
     },
+    completeAllTodos: (state) => {
+      const updatedTodos = state.map(todo => ({ ...todo, completed: true }));
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
+      return updatedTodos;
+    },
+    uncompleteAllTodos: (state) => {
+      const updatedTodos = state.map(todo => ({ ...todo, completed: false }));
+      localStorage.setItem('todos', JSON.stringify(updatedTodos));
+      return updatedTodos;
+    },
+    deleteAllTodos: () => {
+      localStorage.removeItem('todos');
+      return [];
+    }
   },
 });
 
-export const { addTodo, editTodo, removeTodo, toggleComplete, loadTodos } = todosSlice.actions;
+export const { addTodo, editTodo, removeTodo, toggleComplete, loadTodos, completeAllTodos, uncompleteAllTodos, deleteAllTodos } = todosSlice.actions;
 
 export default todosSlice.reducer;

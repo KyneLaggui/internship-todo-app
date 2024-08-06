@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addTodo, editTodo, removeTodo, toggleComplete, loadTodos } from '../redux/todosSlice';
+import { addTodo, editTodo, removeTodo, toggleComplete, loadTodos, completeAllTodos, uncompleteAllTodos, deleteAllTodos } from '../redux/todosSlice';
 import { Button, Form, ListGroup, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
 import { BsThreeDotsVertical } from "react-icons/bs";
 
@@ -52,12 +52,34 @@ function TodoList() {
     dispatch(removeTodo(id));
   };
 
+  const handleCompleteAll = () => {
+    dispatch(completeAllTodos());
+  };
+
+  const handleUncompleteAll = () => {
+    dispatch(uncompleteAllTodos());
+  };
+
+  const handleDeleteAll = () => {
+    dispatch(deleteAllTodos());
+  };
+
   return (
     <div className="todo-container">
-      <h1 className='title'>Motion</h1>
-      <Button className="button-main" onClick={() => setShowAdd(true)}>
-        + New Task
-      </Button>
+      <div className="buttons-container">
+        <Button className="button-main" onClick={() => setShowAdd(true)}>
+          + New Task
+        </Button>
+        <Button variant="success" onClick={handleCompleteAll}>
+          Done All
+        </Button>
+        <Button variant="warning" onClick={handleUncompleteAll}>
+          Undone All
+        </Button>
+        <Button variant="danger" onClick={handleDeleteAll}>
+          Delete All
+        </Button>
+      </div>
 
       <ListGroup>
         {todos.map((todo) => (
@@ -85,11 +107,10 @@ function TodoList() {
             <div>
               <DropdownButton
                 id="dropdown-basic-button"
-                title= {<BsThreeDotsVertical />}
+                title={<BsThreeDotsVertical />}
                 variant="secondary"
                 size="sm"
                 className="mr-2"
-               
               >
                 <Dropdown.Item onClick={() => handleEditTodo(todo.id, todo.task)} disabled={todo.completed}>
                   Edit
