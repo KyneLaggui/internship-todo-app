@@ -96,29 +96,48 @@ function TodoList({ filter, selectedTag }) {
     toast.success("All tasks deleted successfully!");
   };
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track if mobile
+
+  // Effect to handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
     const end = new Date(endDate);
-    const totalSeconds = Math.floor((end - now) / 1000); // Calculate total seconds remaining
-    const days = differenceInDays(end, now);
-    const hours = differenceInHours(end, now) % 24;
-    const minutes = differenceInMinutes(end, now) % 60;
-    const seconds = totalSeconds % 60; // Calculate remaining seconds
+    const totalSeconds = Math.floor((end - now) / 1000);
+    const days = Math.floor(totalSeconds / (3600 * 24));
+    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
-    if (totalSeconds > 0) {
-      if (days > 0) {
-        return `${days} days ${hours} hours ${minutes} minutes ${seconds} seconds remaining`;
-      } else if (hours > 0) {
-        return `${hours} hours ${minutes} minutes ${seconds} seconds remaining`;
-      } else if (minutes > 0) {
-        return `${minutes} minutes ${seconds} seconds remaining`;
-      } else {
-        return `Less than a minute left`;
-      }
+    if (isMobile) {
+      return `${String(days).padStart(2, '0')}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     } else {
-      return 'Time expired';
+      if (totalSeconds > 0) {
+        if (days > 0) {
+          return `${days} days ${hours} hours ${minutes} minutes ${seconds} seconds remaining`;
+        } else if (hours > 0) {
+          return `${hours} hours ${minutes} minutes ${seconds} seconds remaining`;
+        } else if (minutes > 0) {
+          return `${minutes} minutes ${seconds} seconds remaining`;
+        } else {
+          return `Less than a minute left`;
+        }
+      } else {
+        return 'Time expired';
+      }
     }
   };
+  
 
   const filteredAndSortedTodos = getFilteredAndSortedTodos();
 
