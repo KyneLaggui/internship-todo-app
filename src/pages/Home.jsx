@@ -75,10 +75,11 @@ function TodoList({ filter, sortOption, selectedTag }) {
 
   const handleAddTodo = () => {
     if (newTask.trim()) {
-      dispatch(addTodo({ task: newTask, endDate: newEndDate.toISOString(), tags: newTags }));
+      const validTags = newTags.filter(tag => tag.trim() !== '');
+      dispatch(addTodo({ task: newTask, endDate: newEndDate.toISOString(), tags: validTags }));
       setNewTask('');
       setNewEndDate(new Date());
-      setNewTags([]); // Reset tags
+      setNewTags([]);
       setShowAdd(false);
     }
   };
@@ -93,11 +94,12 @@ function TodoList({ filter, sortOption, selectedTag }) {
 
   const handleSaveEdit = () => {
     if (editTask.trim()) {
-      dispatch(editTodo({ id: editId, task: editTask, endDate: editEndDate.toISOString(), tags: editTags }));
+      const validTags = editTags.filter(tag => tag.trim() !== '');
+      dispatch(editTodo({ id: editId, task: editTask, endDate: editEndDate.toISOString(), tags: validTags }));
       setEditId(null);
       setEditTask('');
       setEditEndDate(new Date());
-      setEditTags([]); // Reset tags
+      setEditTags([]);
       setShowEdit(false);
     }
   };
@@ -223,14 +225,13 @@ function TodoList({ filter, sortOption, selectedTag }) {
             />
           </Form.Group>
           <Form.Group>
-              <Form.Label>Tags</Form.Label>
-              <Form.Control
+            <Form.Control
                 type="text"
                 placeholder="Enter tags (comma-separated)"
                 value={newTags.join(', ')}
-                onChange={(e) => setNewTags(e.target.value.split(',').map(tag => tag.trim()))}
+                onChange={(e) => setNewTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))} // Filter empty tags
               />
-            </Form.Group>
+          </Form.Group>
           <Form.Group>
             <DatePicker
               selected={newEndDate}
@@ -267,21 +268,21 @@ function TodoList({ filter, sortOption, selectedTag }) {
           </Form.Group>
 
           <Form.Group>
-              <Form.Label>Tags</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter tags (comma-separated)"
-                value={editTags.join(', ')}
-                onChange={(e) => setEditTags(e.target.value.split(',').map(tag => tag.trim()))}
-              />
-            </Form.Group>
+            <Form.Label>Tags</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter tags (comma-separated)"
+              value={editTags.join(', ')}
+              onChange={(e) => setEditTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))} 
+            />
+          </Form.Group>
 
           <Form.Group>
             <DatePicker
               selected={editEndDate}
               onChange={(date) => setEditEndDate(date)}
               showTimeSelect
-              timeIntervals={1} // Allows selection of any minute
+              timeIntervals={1} 
               dateFormat="MM/dd/yyyy hh:mm aa"
               className="form-control"
             />
