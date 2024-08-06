@@ -28,6 +28,11 @@
   --black-trans-90: rgba(0, 0, 0, 0.9);
   --black-trans-50: rgba(0, 0, 0, 0.5);
   --black-trans-10: rgba(0, 0, 0, 0.01);
+
+  --orange-dark: #f4512c;
+  --orange-light: #fe7e4d;
+  --purple-dark: #5e1b88;
+  --purple-light: #9d70bb;
 }
 
 
