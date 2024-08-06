@@ -56,7 +56,7 @@ function TodoList({ filter, sortOption, selectedTag }) {
       // Return todos that match the current filter and the selected tag (if applicable)
       return matchesFilter && hasSelectedTag;
     });
-    
+
     const todosCopy = [...filteredTodos];
   
     switch (sortOption) {
@@ -83,10 +83,11 @@ function TodoList({ filter, sortOption, selectedTag }) {
     }
   };
 
-  const handleEditTodo = (id, task, endDate) => {
+  const handleEditTodo = (id, task, endDate, tags) => {
     setEditId(id);
     setEditTask(task);
     setEditEndDate(new Date(endDate));
+    setEditTags(tags)
     setShowEdit(true);
   };
 
@@ -196,7 +197,7 @@ function TodoList({ filter, sortOption, selectedTag }) {
                 size="sm"
                 className="mr-2"
               >
-                <Dropdown.Item onClick={() => handleEditTodo(todo.id, todo.task, todo.endDate)} disabled={todo.completed}>
+                <Dropdown.Item onClick={() => handleEditTodo(todo.id, todo.task, todo.endDate, todo.tags)} disabled={todo.completed}>
                   Edit
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)} disabled={todo.completed}>
