@@ -17,6 +17,7 @@ import AddTodoModal from './AddTodoModal';
 import EditTodoModal from './EditTodoModal';
 import SortDropdown from './SortDropdown';
 import noTasksImage from '../../assets/no-tasks.png'; 
+import "./TodoList.css"
 
 function TodoList({ filter, selectedTag }) {
   const todos = useSelector((state) => state.todos);

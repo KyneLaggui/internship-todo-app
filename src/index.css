@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -38,45 +40,22 @@
 
 body {
   margin: 0;
-  font-family: var(--ff-dm-sans);
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f4f4;
 }
 
-.todo-container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-direction: column;
-  margin-inline: auto;
-  gap: 2rem;
-  min-height: 100vh;
-  height: 100%;
-  padding: 2rem; 
-  width: 100%;
-  max-width: 800px;
+/* Override the default focus and active styles for all buttons */
+button:focus,
+button:active,
+button:visited {
+  outline: none !important; /* Remove the outline */
+  box-shadow: none !important; /* Remove the box-shadow */
+  background-color: inherit !important; /* Inherit the background color */
+  color: inherit !important; /* Inherit the text color */
 }
 
-.title {
-  font-size: 2.5rem;
-  border-bottom: 2px solid #ececec;
-  padding-bottom: 1.5rem;
-  width: 100%;
-  color: #141414;
-}
 
-.list-group {
-  width: 100%;
-}
-
-.main-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 5px;
-  border-left: 4px solid var(--purple-secondary);
-  padding: 1rem;
-}
-
-.btn-primary {
+/* .btn-primary {
   background-color: var(--purple-secondary);
   border: none; 
 }
@@ -99,6 +78,11 @@ body {
 .dropdown-toggle::after {
   display: none;
 }
+
+.custom-dark-gray {
+  color: #333333; 
+} */
+
 
 
 
