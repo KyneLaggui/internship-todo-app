@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Nav } from 'react-bootstrap';
 import { FaBars } from 'react-icons/fa';
 import { BsFillHouseFill } from 'react-icons/bs';

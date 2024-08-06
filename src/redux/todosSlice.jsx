@@ -14,7 +14,8 @@ const todosSlice = createSlice({
     addTodo: (state, action) => {
       const newTodo = {
         id: Date.now(),
-        task: action.payload,
+        task: action.payload.task,
+        endDate: action.payload.endDate,
         completed: false,
         createdAt: new Date().toLocaleString(),
         modifiedAt: null,
@@ -23,10 +24,11 @@ const todosSlice = createSlice({
       localStorage.setItem('todos', JSON.stringify(state));
     },
     editTodo: (state, action) => {
-      const { id, task } = action.payload;
+      const { id, task, endDate } = action.payload;
       const todo = state.find(todo => todo.id === id);
       if (todo) {
         todo.task = task;
+        todo.endDate = endDate;
         todo.modifiedAt = new Date().toLocaleString();
         localStorage.setItem('todos', JSON.stringify(state));
       }
