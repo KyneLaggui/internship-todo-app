@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Button, Nav, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button, Nav } from 'react-bootstrap';
 import { FaBars } from 'react-icons/fa';
 import { BsFillHouseFill } from 'react-icons/bs';
 import './Sidebar.css';
 import { useSelector } from 'react-redux';
 
-const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
+const Sidebar = ({ setFilter, setSelectedTag }) => {
   const [open, setOpen] = useState(false);
   const todos = useSelector((state) => state.todos) || [];
   const tags = [...new Set(todos.flatMap(todo => todo.tags))];
@@ -14,42 +14,29 @@ const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
     setOpen(!open);
   };
 
-  // Define filter buttons
-  const filterOptions = [
-    { label: 'All', value: 'All' },
-    { label: 'Done', value: 'Done' },
-    { label: 'Pending', value: 'Pending' },
-  ];
+  const handleFilterClick = (value) => {
+    setFilter(value);
+    setSelectedTag('');
+    if (open) toggleSidebar(); // Close sidebar on button click
+  };
 
-  // Define sort options
-  const sortOptions = [
-    { label: 'Deadline Ascending', value: 'ascending' },
-    { label: 'Deadline Descending', value: 'descending' },
-    { label: 'Deadline Close', value: 'close' },
-    { label: 'Deadline Far', value: 'far' },
-  ];
+  const handleTagClick = (tag) => {
+    setFilter('All');
+    setSelectedTag(tag);
+    if (open) toggleSidebar(); // Close sidebar on button click
+  };
 
   const renderFilterButtons = () => (
-    filterOptions.map(option => (
-      <Button key={option.value} onClick={() => { setFilter(option.value); setSelectedTag(''); }}>
-        {option.label}
+    ['All', 'Done', 'Pending'].map(value => (
+      <Button key={value} onClick={() => handleFilterClick(value)}>
+        {value}
       </Button>
     ))
   );
 
-  const renderSortDropdown = () => (
-    <DropdownButton title="Sort By" variant="secondary" className="mt-2">
-      {sortOptions.map(option => (
-        <Dropdown.Item key={option.value} onClick={() => setSortOption(option.value)}>
-          {option.label}
-        </Dropdown.Item>
-      ))}
-    </DropdownButton>
-  );
-
   const renderTagButtons = () => (
     tags.length > 0 ? tags.map(tag => (
-      <Button key={tag} onClick={() => { setFilter('All'); setSelectedTag(tag); }}>
+      <Button key={tag} onClick={() => handleTagClick(tag)}>
         {tag}
       </Button>
     )) : <p>No tags available</p>
@@ -74,11 +61,10 @@ const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
             </h4>
             <Button variant="light" onClick={toggleSidebar}>Close</Button>
           </div>
-            <Nav className="flex-column">
-              {renderFilterButtons()}
-            </Nav>
-            {renderSortDropdown()}
-            {renderTagButtons()}
+          <Nav className="flex-column">
+            {renderFilterButtons()}
+          </Nav>
+          {renderTagButtons()}
         </div>
       </div>
       <div className="d-none d-lg-block bg-dark text-white p-3" id="sidebar">
@@ -89,7 +75,6 @@ const Sidebar = ({ setFilter, setSortOption, setSelectedTag }) => {
         <Nav className="flex-column">
           {renderFilterButtons()}
         </Nav>
-        {renderSortDropdown()}
         {renderTagButtons()}
       </div>
     </div>

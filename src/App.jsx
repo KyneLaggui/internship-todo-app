@@ -1,8 +1,8 @@
-import Home from './pages/Home'
+// import Home from './pages/Home'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from './layouts/Sidebar/Sidebar';
 import { useState } from 'react';
-import TodoList from './pages/Home';
+import TodoList from './components/ToDo/TodoList';
 
 function App() {
   const [filter, setFilter] = useState('All');
@@ -11,11 +11,15 @@ function App() {
 
   return (
     <>
-    <Sidebar setFilter={setFilter} setSortOption={setSortOption} setSelectedTag={setSelectedTag} />
-    {/* <Home filter={filter} sortOption={sortOption} selectedTag={selectedTag} />  */}
+    <Sidebar setFilter={setFilter} setSelectedTag={setSelectedTag} />
+    {/* <Home filter={filter} 
+        sortOption={sortOption} 
+        setSortOption={setSortOption}
+        selectedTag={selectedTag} />  */}
     <TodoList 
         filter={filter} 
         sortOption={sortOption} 
+        setSortOption={setSortOption}
         selectedTag={selectedTag} 
       />
     
