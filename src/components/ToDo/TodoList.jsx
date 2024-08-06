@@ -16,6 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import AddTodoModal from './AddTodoModal';
 import EditTodoModal from './EditTodoModal';
 import SortDropdown from './SortDropdown';
+import noTasksImage from '../../assets/no-tasks.png'; 
 
 function TodoList({ filter, selectedTag }) {
   const todos = useSelector((state) => state.todos);
@@ -107,6 +108,8 @@ function TodoList({ filter, selectedTag }) {
     }
   };
 
+  const filteredAndSortedTodos = getFilteredAndSortedTodos();
+
   return (
     <div className="todo-container">
       <ToastContainer />
@@ -130,43 +133,50 @@ function TodoList({ filter, selectedTag }) {
         <SortDropdown setSortOption={setSortOption} /> 
       </div>
 
-      <ListGroup>
-  {getFilteredAndSortedTodos().map((todo) => {
-    const isExpired = new Date(todo.endDate) < new Date(); // Check if the todo is expired
+      {filteredAndSortedTodos.length === 0 ? (
+        <div className="no-tasks-container">
+          <img src={noTasksImage} alt="No tasks" className="no-tasks-image" />
+          <p>No tasks available. Please add some tasks!</p>
+        </div>
+      ) : (
+        <ListGroup>
+          {filteredAndSortedTodos.map((todo) => {
+            const isExpired = new Date(todo.endDate) < new Date(); // Check if the todo is expired
 
-    return (
-      <ListGroup.Item
-            key={todo.id}
-            className="main-container"
-            style={{ textDecoration: todo.completed || isExpired ? 'line-through' : 'none' }} // Strike through if completed or expired
-          >
-            <div className="form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                checked={todo.completed}
-                onChange={() => handleToggleComplete(todo.id)}
-                disabled={isExpired} // Disable checkbox if expired
-              />
-              <span className={todo.completed ? 'completed' : ''}>{todo.task}</span>
-              <div className="text-muted ml-2">
-                <small>
-                  End: {todo.endDate ? format(new Date(todo.endDate), 'MM/dd/yyyy hh:mm a') : 'No end date'} <br />
-                  {calculateRemainingTime(todo.endDate)} <br />
-                  Tags: {todo.tags && todo.tags.length > 0 ? todo.tags.join(', ') : 'No tags'}
-                </small>
-              </div>
-              <Dropdown className="more-options">
-                <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic">
-                  <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
-                  <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
-                </DropdownButton>
-              </Dropdown>
-            </div>
-          </ListGroup.Item>
-        );
-      })}
-    </ListGroup>
+            return (
+              <ListGroup.Item
+                key={todo.id}
+                className="main-container"
+                style={{ textDecoration: todo.completed || isExpired ? 'line-through' : 'none' }} // Strike through if completed or expired
+              >
+                <div className="form-check">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={todo.completed}
+                    onChange={() => handleToggleComplete(todo.id)}
+                    disabled={isExpired} // Disable checkbox if expired
+                  />
+                  <span className={todo.completed ? 'completed' : ''}>{todo.task}</span>
+                  <div className="text-muted ml-2">
+                    <small>
+                      End: {todo.endDate ? format(new Date(todo.endDate), 'MM/dd/yyyy hh:mm a') : 'No end date'} <br />
+                      {calculateRemainingTime(todo.endDate)} <br />
+                      Tags: {todo.tags && todo.tags.length > 0 ? todo.tags.join(', ') : 'No tags'}
+                    </small>
+                  </div>
+                  <Dropdown className="more-options">
+                    <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic">
+                      <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
+                    </DropdownButton>
+                  </Dropdown>
+                </div>
+              </ListGroup.Item>
+            );
+          })}
+        </ListGroup>
+      )}
 
       <AddTodoModal show={showAdd} handleClose={() => setShowAdd(false)} />
       <EditTodoModal show={showEdit} handleClose={() => setShowEdit(false)} todo={editTodoData} />
