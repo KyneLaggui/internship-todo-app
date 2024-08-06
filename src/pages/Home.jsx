@@ -12,23 +12,24 @@ import {
 } from '../redux/todosSlice';
 import { Button, Form, ListGroup, Modal, Dropdown, DropdownButton } from 'react-bootstrap';
 import { BsThreeDotsVertical } from "react-icons/bs";
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import { ToastContainer, toast } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify styles
 
 function TodoList({ filter, sortOption, selectedTag }) {
   const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
   const [newTask, setNewTask] = useState('');
   const [newEndDate, setNewEndDate] = useState(new Date());
+  const [newEndTime, setNewEndTime] = useState(''); 
   const [editTask, setEditTask] = useState('');
   const [editEndDate, setEditEndDate] = useState(new Date());
+  const [editEndTime, setEditEndTime] = useState(''); 
   const [editId, setEditId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [editTags, setEditTags] = useState([]);
   const [newTags, setNewTags] = useState([]);
-  
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -37,10 +38,7 @@ function TodoList({ filter, sortOption, selectedTag }) {
 
   const getFilteredAndSortedTodos = () => {
     const filteredTodos = todos.filter(todo => {
-      // Check if the selected tag matches the todo's tags or if no tag is selected
       const hasSelectedTag = selectedTag ? (todo.tags && todo.tags.includes(selectedTag)) : true;
-  
-      // Check if the todo matches the current filter (Done, Pending, or All)
       const matchesFilter = (() => {
         switch (filter) {
           case 'Done':
@@ -49,16 +47,13 @@ function TodoList({ filter, sortOption, selectedTag }) {
             return !todo.completed;
           case 'All':
           default:
-            return true; // Show all todos, regardless of status
+            return true;
         }
       })();
-  
-      // Return todos that match the current filter and the selected tag (if applicable)
       return matchesFilter && hasSelectedTag;
     });
 
     const todosCopy = [...filteredTodos];
-  
     switch (sortOption) {
       case 'ascending':
         return todosCopy.sort((a, b) => a.task.localeCompare(b.task));
@@ -75,12 +70,19 @@ function TodoList({ filter, sortOption, selectedTag }) {
 
   const handleAddTodo = () => {
     if (newTask.trim()) {
+      const now = new Date();
+      const endDateTime = new Date(`${newEndDate.toISOString().split('T')[0]}T${newEndTime}`); // Combine date and time
+    
+      // Check if the end date and time is in the past
+      if (endDateTime < now) {
+        toast.error("You cannot create a task for a past date or time.");
+        return;
+      }
+    
       const validTags = newTags.filter(tag => tag.trim() !== '');
-      dispatch(addTodo({ task: newTask, endDate: newEndDate.toISOString(), tags: validTags }));
-      setNewTask('');
-      setNewEndDate(new Date());
-      setNewTags([]);
-      setShowAdd(false);
+      dispatch(addTodo({ task: newTask, endDate: endDateTime.toISOString(), tags: validTags }));
+      toast.success("Task added successfully!"); // Show success toast
+      resetAddForm();
     }
   };
 
@@ -88,47 +90,65 @@ function TodoList({ filter, sortOption, selectedTag }) {
     setEditId(id);
     setEditTask(task);
     setEditEndDate(new Date(endDate));
-    setEditTags(tags)
+    setEditEndTime(endDate.split('T')[1]); 
+    setEditTags(tags);
     setShowEdit(true);
   };
 
   const handleSaveEdit = () => {
     if (editTask.trim()) {
+      const endDateTime = `${editEndDate.toISOString().split('T')[0]}T${editEndTime}`;
+      const now = new Date();
+      if (editEndDate < now || (editEndDate.toISOString().split('T')[0] === now.toISOString().split('T')[0] && editEndTime < now.toTimeString().split(' ')[0])) {
+        toast.error("You cannot set a past date or time for a task.");
+        return;
+      }
+
       const validTags = editTags.filter(tag => tag.trim() !== '');
-      dispatch(editTodo({ id: editId, task: editTask, endDate: editEndDate.toISOString(), tags: validTags }));
-      setEditId(null);
-      setEditTask('');
-      setEditEndDate(new Date());
-      setEditTags([]);
-      setShowEdit(false);
+      dispatch(editTodo({ id: editId, task: editTask, endDate: endDateTime, tags: validTags }));
+      toast.success("Task edited successfully!"); // Show success toast
+      resetEditForm();
     }
-  };
-
-
-  const handleCloseAdd = () => setShowAdd(false);
-  const handleCloseEdit = () => setShowEdit(false);
-
-  const handleToggleComplete = (id) => {
-    dispatch(toggleComplete(id));
   };
 
   const handleRemoveTodo = (id) => {
     dispatch(removeTodo(id));
+    toast.success("Task deleted successfully!"); // Show success toast
   };
 
+  const resetAddForm = () => {
+    setNewTask('');
+    setNewEndDate(new Date());
+    setNewEndTime('');
+    setNewTags([]);
+    setShowAdd(false);
+  };
+
+  const resetEditForm = () => {
+    setEditId(null);
+    setEditTask('');
+    setEditEndDate(new Date());
+    setEditEndTime('');
+    setEditTags([]);
+    setShowEdit(false);
+  };
+
+  const handleCloseAdd = () => setShowAdd(false);
+  const handleCloseEdit = () => setShowEdit(false);
+  const handleToggleComplete = (id) => {
+    dispatch(toggleComplete(id));
+  };
   const handleCompleteAll = () => {
     dispatch(completeAllTodos());
   };
-
   const handleUncompleteAll = () => {
     dispatch(uncompleteAllTodos());
   };
-
   const handleDeleteAll = () => {
     dispatch(deleteAllTodos());
+    toast.success("All tasks deleted successfully!"); // Show success toast
   };
   
-
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
     const end = new Date(endDate);
@@ -147,8 +167,26 @@ function TodoList({ filter, sortOption, selectedTag }) {
     }
   };
 
+  // Calculate the minimum date and time for the inputs
+  const getMinDate = () => {
+    const now = new Date();
+    return now.toISOString().split('T')[0];
+  };
+
+  const getMinTime = () => {
+    const now = new Date();
+    now.setSeconds(0); // Set seconds to 0 for cleaner input
+    now.setMilliseconds(0); // Set milliseconds to 0
+    now.setMinutes(now.getMinutes() + 1); // Add one minute to the current time
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   return (
     <div className="todo-container">
+      <ToastContainer /> {/* Include ToastContainer here */}
+
       <div className="buttons-container">
         <Button className="button-main" onClick={() => setShowAdd(true)}>
           + New Task
@@ -178,7 +216,15 @@ function TodoList({ filter, sortOption, selectedTag }) {
                 checked={todo.completed}
                 onChange={() => handleToggleComplete(todo.id)}
               />
-              <h1>{todo.tags}</h1>
+               <div className="mt-2">
+                {todo.tags && todo.tags.length > 0 ? (
+                  todo.tags.map((tag, index) => (
+                    <span key={index} className="badge bg-secondary me-1">{tag}</span>
+                  ))
+                ) : (
+                  <span className="text-muted">No tags</span>
+                )}
+              </div>
               <span className={todo.completed ? 'completed' : ''}>{todo.task}</span>
               <div className="text-muted ml-2">
                 <small>
@@ -186,31 +232,21 @@ function TodoList({ filter, sortOption, selectedTag }) {
                     ? `Modified: ${todo.modifiedAt}` 
                     : `Created: ${todo.createdAt}`} <br />
                   End: {todo.endDate ? format(new Date(todo.endDate), 'MM/dd/yyyy hh:mm a') : 'No end date'} <br />
-                  {todo.endDate ? calculateRemainingTime(todo.endDate) : 'No end date'}
+                  {calculateRemainingTime(todo.endDate)}
                 </small>
               </div>
-            </div>
-            
-            <div>
-              <DropdownButton
-                id="dropdown-basic-button"
-                title={<BsThreeDotsVertical />}
-                variant="secondary"
-                size="sm"
-                className="mr-2"
-              >
-                <Dropdown.Item onClick={() => handleEditTodo(todo.id, todo.task, todo.endDate, todo.tags)} disabled={todo.completed}>
-                  Edit
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)} disabled={todo.completed}>
-                  Remove
-                </Dropdown.Item>
-              </DropdownButton>
+              <Dropdown className="more-options">
+                <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic">
+                  <Dropdown.Item onClick={() => handleEditTodo(todo.id, todo.task, todo.endDate, todo.tags)}>Edit</Dropdown.Item>
+                  <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
+                </DropdownButton>
+              </Dropdown>
             </div>
           </ListGroup.Item>
         ))}
       </ListGroup>
 
+      {/* Add Task Modal */}
       <Modal show={showAdd} onHide={handleCloseAdd}>
         <Modal.Header closeButton>
           <Modal.Title>Add Task</Modal.Title>
@@ -219,27 +255,35 @@ function TodoList({ filter, sortOption, selectedTag }) {
           <Form.Group>
             <Form.Control
               type="text"
-              placeholder="Enter new task"
+              placeholder="Add a new task"
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
             />
           </Form.Group>
           <Form.Group>
             <Form.Control
-                type="text"
-                placeholder="Enter tags (comma-separated)"
-                value={newTags.join(', ')}
-                onChange={(e) => setNewTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))} // Filter empty tags
-              />
+              type="text"
+              placeholder="Enter tags (comma-separated)"
+              value={newTags.join(', ')}
+              onChange={(e) => setNewTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))} // Filter empty tags
+            />
           </Form.Group>
           <Form.Group>
-            <DatePicker
-              selected={newEndDate}
-              onChange={(date) => setNewEndDate(date)}
-              showTimeSelect
-              timeIntervals={15}
-              dateFormat="MM/dd/yyyy hh:mm aa"
-              className="form-control"
+            <Form.Label>End Date</Form.Label>
+            <input
+              type="date"
+              min={getMinDate()} 
+              value={newEndDate.toISOString().split('T')[0]}
+              onChange={(e) => setNewEndDate(new Date(e.target.value))}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>End Time</Form.Label>
+            <input
+              type="time"
+              min={getMinTime()}
+              value={newEndTime}
+              onChange={(e) => setNewEndTime(e.target.value)}
             />
           </Form.Group>
         </Modal.Body>
@@ -248,11 +292,12 @@ function TodoList({ filter, sortOption, selectedTag }) {
             Close
           </Button>
           <Button variant="primary" onClick={handleAddTodo}>
-            Save Changes
+            Add Task
           </Button>
         </Modal.Footer>
       </Modal>
 
+      {/* Edit Task Modal */}
       <Modal show={showEdit} onHide={handleCloseEdit}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Task</Modal.Title>
@@ -266,25 +311,30 @@ function TodoList({ filter, sortOption, selectedTag }) {
               onChange={(e) => setEditTask(e.target.value)}
             />
           </Form.Group>
-
           <Form.Group>
-            <Form.Label>Tags</Form.Label>
             <Form.Control
               type="text"
               placeholder="Enter tags (comma-separated)"
               value={editTags.join(', ')}
-              onChange={(e) => setEditTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))} 
+              onChange={(e) => setEditTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))} // Filter empty tags
             />
           </Form.Group>
-
           <Form.Group>
-            <DatePicker
-              selected={editEndDate}
-              onChange={(date) => setEditEndDate(date)}
-              showTimeSelect
-              timeIntervals={1} 
-              dateFormat="MM/dd/yyyy hh:mm aa"
-              className="form-control"
+            <Form.Label>End Date</Form.Label>
+            <input
+              type="date"
+              min={getMinDate()} // Set minimum date
+              value={editEndDate.toISOString().split('T')[0]}
+              onChange={(e) => setEditEndDate(new Date(e.target.value))}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>End Time</Form.Label>
+            <input
+              type="time"
+              min={getMinTime()} // Set minimum time
+              value={editEndTime}
+              onChange={(e) => setEditEndTime(e.target.value)}
             />
           </Form.Group>
         </Modal.Body>
