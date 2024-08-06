@@ -84,6 +84,7 @@
   justify-content: space-between;
   gap: 1rem;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .tasks-deadline {
@@ -175,4 +176,31 @@
   max-width: 500px;
 }
 
+.dropdown-toggle {
+  background-color: white; /* Change this to your desired color */
+  color: #212529; /* Change text color */
+  border-color: 212529; /* Change border color */
+}
 
+.dropdown-item:hover {
+  background-color: var(--purple-light); 
+  color: white; 
+}
+
+.filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.more-options .dropdown-toggle:hover {
+  color: var(--purple-light) !important; /* Change the icon color on hover */
+}
+
+@media (max-width: 600px) {
+  .tasks-subcategories {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

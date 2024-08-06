@@ -48,6 +48,9 @@ function EditTodoModal({ show, handleClose, todo }) {
     handleClose();
   };
 
+  // Get current date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
@@ -83,6 +86,7 @@ function EditTodoModal({ show, handleClose, todo }) {
             <FormControl
               type="date"
               value={endDate.toISOString().split('T')[0]}
+              min={today} // Set the minimum date to today
               onChange={(e) => setEndDate(new Date(e.target.value))}
               className="mb-3"
             />

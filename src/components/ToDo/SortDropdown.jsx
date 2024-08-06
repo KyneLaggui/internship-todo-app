@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { FaFilter } from 'react-icons/fa';
 
 const SortDropdown = ({ setSortOption }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const sortOptions = [
-    { label: 'Deadline Ascending', value: 'ascending' },
-    { label: 'Deadline Descending', value: 'descending' },
-    { label: 'Deadline Close', value: 'close' },
-    { label: 'Deadline Far', value: 'far' },
+    { label: 'Ascending', value: 'ascending' },
+    { label: 'Descending', value: 'descending' },
+    { label: 'Upcoming Deadline', value: 'close' },
+    { label: 'Distant Deadline', value: 'far' },
   ];
 
   const handleSelect = (value) => {
@@ -18,7 +19,12 @@ const SortDropdown = ({ setSortOption }) => {
 
   return (
     <DropdownButton
-      title="Sort By"
+    title={
+      <div className='filter'>
+        <FaFilter />
+        Sort By
+      </div>
+    }
       variant="secondary"
       className="mt-2"
       onToggle={(nextOpen) => setIsOpen(nextOpen)} 

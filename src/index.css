@@ -5,9 +5,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  /* color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -44,45 +44,26 @@ body {
   background-color: #f4f4f4;
 }
 
-/* Override the default focus and active styles for all buttons */
+
 button:focus,
 button:active,
 button:visited {
-  outline: none !important; /* Remove the outline */
-  box-shadow: none !important; /* Remove the box-shadow */
-  background-color: inherit !important; /* Inherit the background color */
-  color: inherit !important; /* Inherit the text color */
+  outline: none !important; 
+  box-shadow: none !important;
+  background-color: inherit !important; 
+  color: inherit !important;
 }
 
-
-/* .btn-primary {
-  background-color: var(--purple-secondary);
-  border: none; 
+input:focus {
+  border-color: violet !important; 
+  background-color: #f5f5f5; 
+  outline: none; 
+  box-shadow: 0 0 5px violet !important; 
 }
 
-.btn-primary:hover {
-  background-color: var(--purple-primary);
-  border: none; 
+input:hover {
+  border-color: violet; 
 }
-
-.btn-secondary {
-  background-color: #fff;
-  border: 2px solid #ebebeb; 
-  color:#454545;
-}
-
-.dropdown-toggle {
-  background-color: none; 
-}
-
-.dropdown-toggle::after {
-  display: none;
-}
-
-.custom-dark-gray {
-  color: #333333; 
-} */
-
 
 
 

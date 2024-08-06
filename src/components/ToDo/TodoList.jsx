@@ -10,7 +10,7 @@ import {
 } from '../../redux/todosSlice';
 import { Button, ListGroup, Dropdown, DropdownButton } from 'react-bootstrap';
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { format, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import { format, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import AddTodoModal from './AddTodoModal';
@@ -95,21 +95,26 @@ function TodoList({ filter, selectedTag }) {
     dispatch(deleteAllTodos());
     toast.success("All tasks deleted successfully!");
   };
-  
 
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
     const end = new Date(endDate);
+    const totalSeconds = Math.floor((end - now) / 1000); // Calculate total seconds remaining
     const days = differenceInDays(end, now);
     const hours = differenceInHours(end, now) % 24;
     const minutes = differenceInMinutes(end, now) % 60;
+    const seconds = totalSeconds % 60; // Calculate remaining seconds
 
-    if (days > 0) {
-      return `${days} days ${hours} hours ${minutes} minutes remaining`;
-    } else if (hours > 0) {
-      return `${hours} hours ${minutes} minutes remaining`;
-    } else if (minutes > 0) {
-      return `${minutes} minutes remaining`;
+    if (totalSeconds > 0) {
+      if (days > 0) {
+        return `${days} days ${hours} hours ${minutes} minutes ${seconds} seconds remaining`;
+      } else if (hours > 0) {
+        return `${hours} hours ${minutes} minutes ${seconds} seconds remaining`;
+      } else if (minutes > 0) {
+        return `${minutes} minutes ${seconds} seconds remaining`;
+      } else {
+        return `Less than a minute left`;
+      }
     } else {
       return 'Time expired';
     }

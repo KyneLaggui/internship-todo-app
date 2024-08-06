@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button, Form, FormControl, Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { addTodo } from '../../redux/todosSlice';
 import { ToastContainer, toast } from 'react-toastify';
@@ -18,14 +18,14 @@ function AddTodoModal({ show, handleClose }) {
       toast.error("Task name cannot be empty.");
       return;
     }
-
+  
     if (!newEndTime) {
       toast.error("Please select an end time.");
       return;
     }
-
+  
     const now = new Date();
-    const endDateTime = new Date(`${newEndDate.toISOString().split('T')[0]}T${newEndTime}`);
+    const endDateTime = new Date(`${newEndDate.toISOString().split('T')[0]}T${newEndTime}:00`); 
   
     if (endDateTime < now) {
       toast.error("You cannot create a task for a past date or time.");
@@ -37,6 +37,7 @@ function AddTodoModal({ show, handleClose }) {
     toast.success("Task added successfully!");
     resetAddForm();
   };
+  
 
   const resetAddForm = () => {
     setNewTask('');
@@ -93,7 +94,7 @@ function AddTodoModal({ show, handleClose }) {
 
           <Form.Group controlId="formEndDate">
             <Form.Label>End Date</Form.Label>
-            <Form.Control
+            <FormControl
               type="date"
               min={getMinDate()} 
               value={newEndDate.toISOString().split('T')[0]}
@@ -104,7 +105,7 @@ function AddTodoModal({ show, handleClose }) {
 
           <Form.Group controlId="formEndTime">
             <Form.Label>End Time</Form.Label>
-            <Form.Control
+            <FormControl
               type="time"
               min={getMinTime()}
               value={newEndTime}
