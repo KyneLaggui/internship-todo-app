@@ -8,7 +8,7 @@ import {
   uncompleteAllTodos, 
   deleteAllTodos 
 } from '../../redux/todosSlice';
-import { Button, ListGroup, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button, ListGroup, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
@@ -29,11 +29,19 @@ function TodoList({ filter, selectedTag }) {
   const [showEdit, setShowEdit] = useState(false);
   const [editTodoData, setEditTodoData] = useState(null);
   const [sortOption, setSortOption] = useState('ascending');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationAction, setConfirmationAction] = useState(null);
+  const [todoToDelete, setTodoToDelete] = useState(null);
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
     dispatch(loadTodos(storedTodos));
   }, [dispatch]);
+
+  const handleConfirmation = (action) => {
+    setConfirmationAction(action);
+    setShowConfirmation(true);
+  };
 
   const getFilteredAndSortedTodos = () => {
     const filteredTodos = todos.filter(todo => {
@@ -84,20 +92,38 @@ function TodoList({ filter, selectedTag }) {
 
   const handleCompleteAll = () => {
     const currentTodos = todos.filter(todo => new Date(todo.endDate) >= new Date());
+
+    const allCompleted = currentTodos.every(todo => todo.completed);
+    
+    if (allCompleted) {
+      toast.info("All tasks are already marked as done!");
+      return;
+    }
+
     if (currentTodos.length === 0) {
       toast.error("No tasks available to mark as done!");
       return;
     }
+    
     dispatch(completeAllTodos(currentTodos.map(todo => todo.id))); 
     toast.success("All tasks marked as done!");
   };
   
   const handleUncompleteAll = () => {
     const currentTodos = todos.filter(todo => new Date(todo.endDate) >= new Date());
+
+    const allUndone = currentTodos.every(todo => !todo.completed);
+  
+    if (allUndone) {
+      toast.info("All tasks are already marked as undone!");
+      return;
+    }
+  
     if (currentTodos.length === 0) {
       toast.error("No tasks available to mark as undone!");
       return;
     }
+
     dispatch(uncompleteAllTodos(currentTodos.map(todo => todo.id)));
     toast.success("All tasks marked as undone!");
   };
@@ -147,6 +173,40 @@ function TodoList({ filter, selectedTag }) {
       }
     }
   };
+
+  const ConfirmationModal = ({ show, handleClose, onConfirm }) => (
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Confirm Action</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>Are you sure you want to proceed with this action?</Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={onConfirm}>
+          Confirm
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+
+  const handleConfirm = () => {
+    switch (confirmationAction) {
+      case 'completeAll':
+        handleCompleteAll();
+        break;
+      case 'uncompleteAll':
+        handleUncompleteAll();
+        break;
+      case 'deleteAll':
+        handleDeleteAll();
+        break;
+      default:
+        break;
+    }
+    setShowConfirmation(false);
+  };
   
 
   const filteredAndSortedTodos = getFilteredAndSortedTodos();
@@ -159,13 +219,13 @@ function TodoList({ filter, selectedTag }) {
         <Button className="btn-list" onClick={() => setShowAdd(true)}>
           <FaPlus style={{ marginRight: '8px' }} /> New Task
         </Button>
-        <Button className="btn-list" onClick={handleCompleteAll}>
+        <Button className="btn-list" onClick={() => handleConfirmation('completeAll')}>
           <FaCheck style={{ marginRight: '8px' }} /> Done All
         </Button>
-        <Button className="btn-list" onClick={handleUncompleteAll}>
+        <Button className="btn-list" onClick={() => handleConfirmation('uncompleteAll')}>
           <FaUndo style={{ marginRight: '8px' }} /> Undone All
         </Button>
-        <Button className="btn-list" onClick={handleDeleteAll}>
+        <Button className="btn-list" onClick={() => handleConfirmation('deleteAll')}>
           <FaTrash style={{ marginRight: '8px' }} /> Delete All
         </Button>
       </div>
@@ -246,6 +306,12 @@ function TodoList({ filter, selectedTag }) {
 
       <AddTodoModal show={showAdd} handleClose={() => setShowAdd(false)} />
       <EditTodoModal show={showEdit} handleClose={() => setShowEdit(false)} todo={editTodoData} />
+
+      <ConfirmationModal 
+        show={showConfirmation} 
+        handleClose={() => setShowConfirmation(false)} 
+        onConfirm={handleConfirm} 
+      />
     </div>
   );
 }

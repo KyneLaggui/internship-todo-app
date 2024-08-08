@@ -57,7 +57,7 @@ const todosSlice = createSlice({
     loadTodos: (state, action) => {
       return action.payload;
     },
-    completeAll(state, action) {
+    completeAllTodos(state, action) {
       const ids = action.payload; 
       const currentDate = new Date();
       state.forEach(todo => {
@@ -66,7 +66,7 @@ const todosSlice = createSlice({
         }
       });
     },
-    uncompleteAll(state, action) {
+    uncompleteAllTodos(state, action) {
       const ids = action.payload;
       const currentDate = new Date();
       state.forEach(todo => {
