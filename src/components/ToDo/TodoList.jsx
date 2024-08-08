@@ -31,6 +31,7 @@ function TodoList({ filter, selectedTag }) {
   const [sortOption, setSortOption] = useState('ascending');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
+  const [todoToDelete, setTodoToDelete] = useState(null);
 
 
   useEffect(() => {
@@ -38,10 +39,12 @@ function TodoList({ filter, selectedTag }) {
     dispatch(loadTodos(storedTodos));
   }, [dispatch]);
 
-  const handleConfirmation = (action) => {
+  const handleConfirmation = (action, todoId) => {
     setConfirmationAction(action);
+    setTodoToDelete(todoId); 
     setShowConfirmation(true);
   };
+
 
   const getFilteredAndSortedTodos = () => {
     const filteredTodos = todos.filter(todo => {
@@ -190,7 +193,7 @@ function TodoList({ filter, selectedTag }) {
     </Modal>
   );
 
-  const handleConfirm = () => {
+  const handleConfirm = (todo) => {
     switch (confirmationAction) {
       case 'completeAll':
         handleCompleteAll();
@@ -200,6 +203,11 @@ function TodoList({ filter, selectedTag }) {
         break;
       case 'deleteAll':
         handleDeleteAll();
+        break;
+      case 'delete':
+        if (todoToDelete) {
+          handleRemoveTodo(todoToDelete);
+        }
         break;
       default:
         break;
@@ -299,7 +307,12 @@ function TodoList({ filter, selectedTag }) {
                     <Dropdown className="more-options">
                         <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
                           <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
-                          <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
+                          <Dropdown.Item onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleConfirmation('delete', todo.id); 
+                          }}>
+                            Delete
+                          </Dropdown.Item>
                         </DropdownButton>
                       </Dropdown>
                   </div>
