@@ -57,15 +57,23 @@ const todosSlice = createSlice({
     loadTodos: (state, action) => {
       return action.payload;
     },
-    completeAllTodos: (state) => {
-      const updatedTodos = state.map(todo => ({ ...todo, completed: true }));
-      localStorage.setItem('todos', JSON.stringify(updatedTodos));
-      return updatedTodos;
+    completeAll(state, action) {
+      const ids = action.payload; 
+      const currentDate = new Date();
+      state.forEach(todo => {
+        if (ids.includes(todo.id) && new Date(todo.endDate) >= currentDate) {
+          todo.completed = true; 
+        }
+      });
     },
-    uncompleteAllTodos: (state) => {
-      const updatedTodos = state.map(todo => ({ ...todo, completed: false }));
-      localStorage.setItem('todos', JSON.stringify(updatedTodos));
-      return updatedTodos;
+    uncompleteAll(state, action) {
+      const ids = action.payload;
+      const currentDate = new Date();
+      state.forEach(todo => {
+        if (ids.includes(todo.id) && new Date(todo.endDate) >= currentDate) {
+          todo.completed = false; 
+        }
+      });
     },
     deleteAllTodos: () => {
       localStorage.removeItem('todos');

@@ -8,7 +8,7 @@ import {
   uncompleteAllTodos, 
   deleteAllTodos 
 } from '../../redux/todosSlice';
-import { Button, ListGroup, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button, ListGroup, Dropdown, DropdownButton } from 'react-bootstrap';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
@@ -29,9 +29,6 @@ function TodoList({ filter, selectedTag }) {
   const [showEdit, setShowEdit] = useState(false);
   const [editTodoData, setEditTodoData] = useState(null);
   const [sortOption, setSortOption] = useState('ascending');
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmAction, setConfirmAction] = useState(null);
-  const [todoToDelete, setTodoToDelete] = useState(null);
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -54,6 +51,7 @@ function TodoList({ filter, selectedTag }) {
       })();
       return matchesFilter && hasSelectedTag;
     });
+
 
     const todosCopy = [...filteredTodos];
     switch (sortOption) {
@@ -85,36 +83,32 @@ function TodoList({ filter, selectedTag }) {
   };
 
   const handleCompleteAll = () => {
-    dispatch(completeAllTodos());
+    const currentTodos = todos.filter(todo => new Date(todo.endDate) >= new Date());
+    if (currentTodos.length === 0) {
+      toast.error("No tasks available to mark as done!");
+      return;
+    }
+    dispatch(completeAllTodos(currentTodos.map(todo => todo.id))); 
     toast.success("All tasks marked as done!");
   };
   
   const handleUncompleteAll = () => {
-    dispatch(uncompleteAllTodos());
+    const currentTodos = todos.filter(todo => new Date(todo.endDate) >= new Date());
+    if (currentTodos.length === 0) {
+      toast.error("No tasks available to mark as undone!");
+      return;
+    }
+    dispatch(uncompleteAllTodos(currentTodos.map(todo => todo.id)));
     toast.success("All tasks marked as undone!");
   };
+  
   
   const handleDeleteAll = () => {
     dispatch(deleteAllTodos());
     toast.success("All tasks deleted successfully!");
   };
 
-  const handleConfirmAction = (action, todo = null) => {
-    setConfirmAction(() => action);
-    setTodoToDelete(todo);
-    setShowConfirmModal(true);
-  };
-
-  const confirmAndExecuteAction = () => {
-    if (confirmAction) {
-      confirmAction();
-    }
-    setShowConfirmModal(false);
-  };
-
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track if mobile
-
-  // Effect to handle window resize
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -153,6 +147,7 @@ function TodoList({ filter, selectedTag }) {
       }
     }
   };
+  
 
   const filteredAndSortedTodos = getFilteredAndSortedTodos();
 
@@ -164,13 +159,13 @@ function TodoList({ filter, selectedTag }) {
         <Button className="btn-list" onClick={() => setShowAdd(true)}>
           <FaPlus style={{ marginRight: '8px' }} /> New Task
         </Button>
-        <Button className="btn-list" onClick={() => handleConfirmAction(handleCompleteAll)}>
+        <Button className="btn-list" onClick={handleCompleteAll}>
           <FaCheck style={{ marginRight: '8px' }} /> Done All
         </Button>
-        <Button className="btn-list" onClick={() => handleConfirmAction(handleUncompleteAll)}>
+        <Button className="btn-list" onClick={handleUncompleteAll}>
           <FaUndo style={{ marginRight: '8px' }} /> Undone All
         </Button>
-        <Button className="btn-list" onClick={() => handleConfirmAction(handleDeleteAll)}>
+        <Button className="btn-list" onClick={handleDeleteAll}>
           <FaTrash style={{ marginRight: '8px' }} /> Delete All
         </Button>
       </div>
@@ -182,7 +177,7 @@ function TodoList({ filter, selectedTag }) {
       {filteredAndSortedTodos.length === 0 ? (
         <div className="no-tasks-container">
           <img src={noTasksImage} alt="No tasks" className="no-tasks-image" />
-          <p>No tasks available!</p>
+          <p className='gray-text'>No tasks available!</p>
         </div>
       ) : (
         <ListGroup>
@@ -224,34 +219,23 @@ function TodoList({ filter, selectedTag }) {
                   </div>
                   
                   <div className='tasks-right'>
-                    {todo.tags && (
-                      <div className='tasks-tags'>
-                        <span className="tags-tasks">
-                          {todo.tags.map((tag, index) => (
-                            <span key={index} className="tags-tasks-content">
-                              <HiOutlineHashtag size={14} /> {tag}
-                            </span>
-                          ))}
-                        </span>
+                    <div className="tasks-subcategories">  
+                      <div className='tasks-deadline'>
+                        <FaCircle size={8} />
+                        {calculateRemainingTime(todo.endDate)}
                       </div>
-                    )}
-                    
-                    <div className='tasks-remaining'>
-                      <span className={`tasks-remaining-time ${isExpired ? 'expired' : ''}`}>
-                        {isExpired ? 'Time expired' : calculateRemainingTime(todo.endDate)}
-                      </span>
+                      <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`}>
+                        <HiOutlineHashtag />
+                        {todo.tags && todo.tags.join(', ')}
+                      </div>
+                      
                     </div>
-
-                    <DropdownButton
-                      align="end"
-                      title={<BsThreeDotsVertical />}
-                      id="dropdown-menu-align-end"
-                      variant="light"
-                      className="dropdown-button-tasks"
-                    >
-                      <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleConfirmAction(() => handleRemoveTodo(todo.id), todo)}>Delete</Dropdown.Item>
-                    </DropdownButton>
+                    <Dropdown className="more-options">
+                      <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
+                        <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
+                        <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
+                      </DropdownButton>
+                    </Dropdown>
                   </div>
                 </div>
               </ListGroup.Item>
@@ -262,22 +246,6 @@ function TodoList({ filter, selectedTag }) {
 
       <AddTodoModal show={showAdd} handleClose={() => setShowAdd(false)} />
       <EditTodoModal show={showEdit} handleClose={() => setShowEdit(false)} todo={editTodoData} />
-
-      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Action</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {confirmAction === handleCompleteAll && "Are you sure you want to mark all tasks as done?"}
-          {confirmAction === handleUncompleteAll && "Are you sure you want to mark all tasks as undone?"}
-          {confirmAction === handleDeleteAll && "Are you sure you want to delete all tasks?"}
-          {confirmAction === (() => handleRemoveTodo(todoToDelete.id)) && `Are you sure you want to delete the task "${todoToDelete?.task}"?`}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={confirmAndExecuteAction}>Confirm</Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 }
