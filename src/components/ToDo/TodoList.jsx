@@ -249,55 +249,61 @@ function TodoList({ filter, selectedTag }) {
                 className="main-container"
                
               >
-                <div className="form-check">
-                  <div className='tasks-left'>
-                    <input
-                      type="checkbox"
-                      className="form-check-input checkbox-tasks"
-                      checked={todo.completed}
-                      onChange={() => handleToggleComplete(todo.id)}
-                      disabled={isExpired}
-                    />
-                    <div className='tasks-contents'>
-                      <div className='tasks-important'>
-                        <h1 className={todo.completed ? 'completed-title' : 'tasks-title'}>{todo.task}</h1>
-                        {todo.endDate && (  
-                          <div className='tasks-date'>
-                            <span className={todo.completed ? 'completed-icons' : 'tasks-icon'}>
-                              <CiCalendar size={14} /> {format(new Date(todo.endDate), 'MM/dd/yyyy')}
+             
+                  <div className='tasks-container'>
+                    <div className='tasks-left'>
+                      <input
+                        type="checkbox"
+                        className="form-check-input checkbox-tasks"
+                        checked={todo.completed}
+                        onChange={() => handleToggleComplete(todo.id)}
+                        disabled={isExpired}
+                      />
+                      <div className='tasks-contents'>
+                        <div className='tasks-important'>
+                          <h1 className={todo.completed || isExpired ? 'completed-title' : 'tasks-title'}>{todo.task}</h1>
+                          {todo.endDate && (  
+                            <div className='tasks-date'>
+                              <span className={todo.completed || isExpired ? 'completed-icons' : 'tasks-icon'}>
+                                <CiCalendar size={14} /> {format(new Date(todo.endDate), 'MM/dd/yyyy')}
+                              </span>
+                              <span className={todo.completed || isExpired ? 'completed-icons' : 'tasks-icon'}>
+                                <FaRegClock size={14} /> {format(new Date(todo.endDate), 'hh:mm a')}
+                              </span>
+                            </div>
+                          )}
+                        </div>                   
+                      </div>
+                    </div>
+                    
+                    <div className="tasks-right" >
+                      <div className="tasks-subcategories">  
+                        <div className={`tasks-deadline ${todo.completed || isExpired ? 'completed-deadline' : ''}`}>
+                          <FaCircle size={8} />
+                          {calculateRemainingTime(todo.endDate)}
+                        </div>
+                        {todo.tags && todo.tags.map((tag, index) => (
+                          <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`} key={index}>
+                            <span className={todo.completed || isExpired ? 'completed-deadline ' : ''}>
+                              <HiOutlineHashtag />
+                              {tag}
                             </span>
-                            <span className={todo.completed ? 'completed-icons' : 'tasks-icon'}>
-                              <FaRegClock size={14} /> {format(new Date(todo.endDate), 'hh:mm a')}
-                            </span>
-                          </div>
-                        )}
-                      </div>                   
+                        </div>
+                        ))}
+                      </div>
+                      
                     </div>
                   </div>
                   
-                  <div className="tasks-right" >
-                    <div className="tasks-subcategories">  
-                      <div className={`tasks-deadline ${todo.completed ? 'completed-deadline' : ''}`}>
-                        <FaCircle size={8} />
-                        {calculateRemainingTime(todo.endDate)}
-                      </div>
-                      {todo.tags && todo.tags.map((tag, index) => (
-                        <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`} key={index}>
-                          <span className={todo.completed ? 'completed-deadline ' : ''}>
-                            <HiOutlineHashtag />
-                            {tag}
-                          </span>
-                      </div>
-                      ))}
-                    </div>
+                  <div className='dropdown-container'>
                     <Dropdown className="more-options">
-                      <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
-                        <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
-                      </DropdownButton>
-                    </Dropdown>
+                        <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
+                          <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
+                          <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
+                        </DropdownButton>
+                      </Dropdown>
                   </div>
-                </div>
+              
               </ListGroup.Item>
             );
           })}
