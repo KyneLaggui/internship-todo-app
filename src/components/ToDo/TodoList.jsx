@@ -220,7 +220,19 @@ function TodoList({ filter, selectedTag }) {
 
   return (
     <div className="todo-container">
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition:Bounce
+      />
 
       <div className="buttons-container">
         <Button className="btn-list" onClick={() => setShowAdd(true)}>

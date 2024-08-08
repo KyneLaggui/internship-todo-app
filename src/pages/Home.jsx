@@ -185,7 +185,7 @@ function TodoList({ filter, sortOption, selectedTag }) {
 
   return (
     <div className="todo-container">
-      <ToastContainer /> {/* Include ToastContainer here */}
+      <ToastContainer /> 
 
       <div className="buttons-container">
         <Button className="button-main" onClick={() => setShowAdd(true)}>

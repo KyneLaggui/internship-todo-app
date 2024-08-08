@@ -67,7 +67,19 @@ function AddTodoModal({ show, handleClose }) {
         <Modal.Title>Add Task</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <ToastContainer />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition:Bounce
+        />
         <Form>
           <Form.Group controlId="formTask">
             <Form.Label>Task</Form.Label>
