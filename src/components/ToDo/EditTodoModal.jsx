@@ -107,7 +107,7 @@ function EditTodoModal({ show, handleClose, todo }) {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleEditTodo}>
+        <Button className="btn-modal" onClick={handleEditTodo}>
           Save Changes
         </Button>
       </Modal.Footer>

@@ -31,7 +31,7 @@ function TodoList({ filter, selectedTag }) {
   const [sortOption, setSortOption] = useState('ascending');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationAction, setConfirmationAction] = useState(null);
-  const [todoToDelete, setTodoToDelete] = useState(null);
+
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -92,7 +92,7 @@ function TodoList({ filter, selectedTag }) {
 
   const handleCompleteAll = () => {
     const currentTodos = todos.filter(todo => new Date(todo.endDate) >= new Date());
-
+    
     const allCompleted = currentTodos.every(todo => todo.completed);
     
     if (allCompleted) {
@@ -104,7 +104,6 @@ function TodoList({ filter, selectedTag }) {
       toast.error("No tasks available to mark as done!");
       return;
     }
-    
     dispatch(completeAllTodos(currentTodos.map(todo => todo.id))); 
     toast.success("All tasks marked as done!");
   };
@@ -184,7 +183,7 @@ function TodoList({ filter, selectedTag }) {
         <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={onConfirm}>
+        <Button className="btn-modal" onClick={onConfirm}>
           Confirm
         </Button>
       </Modal.Footer>
@@ -248,7 +247,7 @@ function TodoList({ filter, selectedTag }) {
               <ListGroup.Item
                 key={todo.id}
                 className="main-container"
-                style={{ textDecoration: todo.completed || isExpired ? 'line-through' : 'none' }} 
+               
               >
                 <div className="form-check">
                   <div className='tasks-left'>
@@ -278,7 +277,7 @@ function TodoList({ filter, selectedTag }) {
                     </div>
                   </div>
                   
-                  <div className='tasks-right'>
+                  <div className={todo.completed ? 'tags-completed' : 'tasks-right'} >
                     <div className="tasks-subcategories">  
                       <div className='tasks-deadline'>
                         <FaCircle size={8} />

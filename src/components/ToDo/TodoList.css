@@ -49,8 +49,13 @@
   margin: 0;
 }
 
-.btn-list:hover, .btn-list:active {
-  background-color:var(--orange-dark);
+.btn-list:hover,
+.btn-list:active,
+.btn-list:visited {
+  outline: none !important; 
+  box-shadow: none !important;
+  background-color: var(--orange-primary) !important;
+  color: white !important;
 }
 
 .btn-dropdown {
@@ -205,6 +210,16 @@
 .gray-text {
   color: #5d6063;
   font-weight: 500;
+}
+
+.completed {
+  background-color: red;
+  text-decoration: line-through;
+}
+
+.tags-completed {
+  background-color: red;
+  text-decoration: line-through;
 }
 
 @media (max-width: 600px) {

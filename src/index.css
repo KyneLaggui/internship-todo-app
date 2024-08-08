@@ -45,14 +45,14 @@ body {
 }
 
 
-button:focus,
+/* button:focus,
 button:active,
 button:visited {
   outline: none !important; 
   box-shadow: none !important;
-  background-color: inherit !important; 
+  background-color: transparent !important; 
   color: inherit !important;
-}
+} */
 
 input:focus {
   border-color: violet !important; 
