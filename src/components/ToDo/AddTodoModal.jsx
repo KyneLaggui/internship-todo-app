@@ -3,8 +3,7 @@ import { Button, Form, FormControl, Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { addTodo } from '../../redux/todosSlice';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Ensure toast styles are imported
-import { format } from 'date-fns';
+import 'react-toastify/dist/ReactToastify.css'; 
 
 function AddTodoModal({ show, handleClose }) {
   const dispatch = useDispatch();
@@ -87,7 +86,18 @@ function AddTodoModal({ show, handleClose }) {
               type="text"
               placeholder="Enter tags (comma-separated)"
               value={newTags.join(', ')}
-              onChange={(e) => setNewTags(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== ''))}
+              onChange={(e) => {
+                
+                const inputValue = e.target.value;
+                setNewTags(inputValue.split(',').map(tag => tag.trim())); 
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                  e.preventDefault(); 
+                  const tags = newTags.filter(tag => tag); 
+                  setNewTags([...tags, '']); 
+                }
+              }}
               className="mb-3"
             />
           </Form.Group>

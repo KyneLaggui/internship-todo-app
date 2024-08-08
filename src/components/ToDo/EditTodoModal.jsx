@@ -14,8 +14,9 @@ function EditTodoModal({ show, handleClose, todo }) {
   useEffect(() => {
     if (todo) {
       setTask(todo.task);
-      setEndDate(new Date(todo.endDate));
-      setEndTime(new Date(todo.endDate).toISOString().split('T')[1].substring(0, 5));
+      const todoEndDate = new Date(todo.endDate);
+      setEndDate(todoEndDate);
+      setEndTime(todoEndDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
       setTags(todo.tags || []);
     }
   }, [todo]);
@@ -27,7 +28,7 @@ function EditTodoModal({ show, handleClose, todo }) {
     }
 
     const now = new Date();
-    const endDateTime = new Date(`${endDate.toISOString().split('T')[0]}T${endTime}`);
+    const endDateTime = new Date(`${endDate.toISOString().split('T')[0]}T${endTime}:00`);
     
     if (endDateTime < now) {
       toast.error("You cannot create a task for a past date or time.");
