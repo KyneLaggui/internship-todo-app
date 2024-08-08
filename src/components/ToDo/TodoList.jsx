@@ -282,7 +282,7 @@ function TodoList({ filter, selectedTag }) {
                         {calculateRemainingTime(todo.endDate)}
                       </div>
                       <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`}>
-                        <span className={todo.completed ? 'completed-tasks' : ''}>
+                        <span className={todo.completed ? 'completed-deadline ' : ''}>
                           <HiOutlineHashtag />
                           {todo.tags && todo.tags.join(', ')}
                           </span>
