@@ -11,14 +11,7 @@
     width: 100%;
     max-width: 800px;
   }
-  
-.title {
-  font-size: 2.5rem;
-  border-bottom: 2px solid #ececec;
-  padding-bottom: 1.5rem;
-  width: 100%;
-  color: #141414;
-}
+
 
 .list-group {
   width: 100%;
@@ -73,7 +66,8 @@
 
 .tasks-title {
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--purple-dark);
 }
 
 .tasks-contents {
@@ -104,6 +98,16 @@
   gap: 4px;
 }
 
+.completed-deadline {
+  background-color: #f5f3ff;
+  color: #a8a7a7;
+}
+
+.completed-tasks {
+  background-color: #f5f3ff;
+  color: #a8a7a7;
+}
+
 .tasks-tags {
   background-color: #f5f3ff;
   color: #7029eb;
@@ -125,6 +129,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.8em;
+  color: #808080;
 }
 
 .tasks-important {
@@ -212,15 +217,23 @@
   font-weight: 500;
 }
 
-.completed {
-  background-color: red;
+.completed-title {
+  color: #5d6063;
+  font-size: 1em;
+  font-weight: 400;
   text-decoration: line-through;
 }
 
-.tags-completed {
-  background-color: red;
+.completed-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8em;
+  color: #a8a7a7;
   text-decoration: line-through;
+
 }
+
 
 @media (max-width: 600px) {
   .tasks-subcategories {
