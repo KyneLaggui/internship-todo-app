@@ -177,9 +177,9 @@
 }
 
 .dropdown-toggle {
-  background-color: white; /* Change this to your desired color */
-  color: #212529; /* Change text color */
-  border-color: 212529; /* Change border color */
+  background-color: white;
+  color: #5d6063;;
+  border-color: 212529; 
 }
 
 .dropdown-item:hover {
@@ -195,7 +195,7 @@
 }
 
 .more-options .dropdown-toggle:hover {
-  color: var(--purple-light) !important; /* Change the icon color on hover */
+  color: var(--purple-light) !important; 
 }
 
 @media (max-width: 600px) {
