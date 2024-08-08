@@ -281,13 +281,14 @@ function TodoList({ filter, selectedTag }) {
                         <FaCircle size={8} />
                         {calculateRemainingTime(todo.endDate)}
                       </div>
-                      <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`}>
-                        <span className={todo.completed ? 'completed-deadline ' : ''}>
-                          <HiOutlineHashtag />
-                          {todo.tags && todo.tags.join(', ')}
+                      {todo.tags && todo.tags.map((tag, index) => (
+                        <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`} key={index}>
+                          <span className={todo.completed ? 'completed-deadline ' : ''}>
+                            <HiOutlineHashtag />
+                            {tag}
                           </span>
                       </div>
-                      
+                      ))}
                     </div>
                     <Dropdown className="more-options">
                       <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
