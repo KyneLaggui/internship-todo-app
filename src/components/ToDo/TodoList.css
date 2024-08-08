@@ -182,6 +182,10 @@
   border-color: 212529; 
 }
 
+.dropdown-item {
+  color: #5d6063;;
+}
+
 .dropdown-item:hover {
   background-color: var(--purple-light); 
   color: white; 
@@ -196,6 +200,11 @@
 
 .more-options .dropdown-toggle:hover {
   color: var(--purple-light) !important; 
+}
+
+.gray-text {
+  color: #5d6063;
+  font-weight: 500;
 }
 
 @media (max-width: 600px) {

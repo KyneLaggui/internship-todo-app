@@ -8,9 +8,9 @@ import {
   uncompleteAllTodos, 
   deleteAllTodos 
 } from '../../redux/todosSlice';
-import { Button, ListGroup, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button, ListGroup, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { format, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+import { format } from 'date-fns';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import AddTodoModal from './AddTodoModal';
@@ -29,6 +29,9 @@ function TodoList({ filter, selectedTag }) {
   const [showEdit, setShowEdit] = useState(false);
   const [editTodoData, setEditTodoData] = useState(null);
   const [sortOption, setSortOption] = useState('ascending');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [todoToDelete, setTodoToDelete] = useState(null);
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -96,6 +99,19 @@ function TodoList({ filter, selectedTag }) {
     toast.success("All tasks deleted successfully!");
   };
 
+  const handleConfirmAction = (action, todo = null) => {
+    setConfirmAction(() => action);
+    setTodoToDelete(todo);
+    setShowConfirmModal(true);
+  };
+
+  const confirmAndExecuteAction = () => {
+    if (confirmAction) {
+      confirmAction();
+    }
+    setShowConfirmModal(false);
+  };
+
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); // Track if mobile
 
   // Effect to handle window resize
@@ -137,7 +153,6 @@ function TodoList({ filter, selectedTag }) {
       }
     }
   };
-  
 
   const filteredAndSortedTodos = getFilteredAndSortedTodos();
 
@@ -149,13 +164,13 @@ function TodoList({ filter, selectedTag }) {
         <Button className="btn-list" onClick={() => setShowAdd(true)}>
           <FaPlus style={{ marginRight: '8px' }} /> New Task
         </Button>
-        <Button className="btn-list" onClick={handleCompleteAll}>
+        <Button className="btn-list" onClick={() => handleConfirmAction(handleCompleteAll)}>
           <FaCheck style={{ marginRight: '8px' }} /> Done All
         </Button>
-        <Button className="btn-list" onClick={handleUncompleteAll}>
+        <Button className="btn-list" onClick={() => handleConfirmAction(handleUncompleteAll)}>
           <FaUndo style={{ marginRight: '8px' }} /> Undone All
         </Button>
-        <Button className="btn-list" onClick={handleDeleteAll}>
+        <Button className="btn-list" onClick={() => handleConfirmAction(handleDeleteAll)}>
           <FaTrash style={{ marginRight: '8px' }} /> Delete All
         </Button>
       </div>
@@ -209,23 +224,34 @@ function TodoList({ filter, selectedTag }) {
                   </div>
                   
                   <div className='tasks-right'>
-                    <div className="tasks-subcategories">  
-                      <div className='tasks-deadline'>
-                        <FaCircle size={8} />
-                        {calculateRemainingTime(todo.endDate)}
+                    {todo.tags && (
+                      <div className='tasks-tags'>
+                        <span className="tags-tasks">
+                          {todo.tags.map((tag, index) => (
+                            <span key={index} className="tags-tasks-content">
+                              <HiOutlineHashtag size={14} /> {tag}
+                            </span>
+                          ))}
+                        </span>
                       </div>
-                      <div className={`tasks-tags ${!(todo.tags && todo.tags.length > 0) ? 'tags-hidden' : ''}`}>
-                        <HiOutlineHashtag />
-                        {todo.tags && todo.tags.join(', ')}
-                      </div>
-                      
+                    )}
+                    
+                    <div className='tasks-remaining'>
+                      <span className={`tasks-remaining-time ${isExpired ? 'expired' : ''}`}>
+                        {isExpired ? 'Time expired' : calculateRemainingTime(todo.endDate)}
+                      </span>
                     </div>
-                    <Dropdown className="more-options">
-                      <DropdownButton title={<BsThreeDotsVertical />} variant="link" id="dropdown-basic" >
-                        <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
-                        <Dropdown.Item onClick={() => handleRemoveTodo(todo.id)}>Delete</Dropdown.Item>
-                      </DropdownButton>
-                    </Dropdown>
+
+                    <DropdownButton
+                      align="end"
+                      title={<BsThreeDotsVertical />}
+                      id="dropdown-menu-align-end"
+                      variant="light"
+                      className="dropdown-button-tasks"
+                    >
+                      <Dropdown.Item onClick={() => handleEditTodo(todo)}>Edit</Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleConfirmAction(() => handleRemoveTodo(todo.id), todo)}>Delete</Dropdown.Item>
+                    </DropdownButton>
                   </div>
                 </div>
               </ListGroup.Item>
@@ -236,6 +262,22 @@ function TodoList({ filter, selectedTag }) {
 
       <AddTodoModal show={showAdd} handleClose={() => setShowAdd(false)} />
       <EditTodoModal show={showEdit} handleClose={() => setShowEdit(false)} todo={editTodoData} />
+
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Action</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {confirmAction === handleCompleteAll && "Are you sure you want to mark all tasks as done?"}
+          {confirmAction === handleUncompleteAll && "Are you sure you want to mark all tasks as undone?"}
+          {confirmAction === handleDeleteAll && "Are you sure you want to delete all tasks?"}
+          {confirmAction === (() => handleRemoveTodo(todoToDelete.id)) && `Are you sure you want to delete the task "${todoToDelete?.task}"?`}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={confirmAndExecuteAction}>Confirm</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
